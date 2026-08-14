@@ -12,6 +12,7 @@ import SettingsPanel from "./components/SettingsPanel";
 import OfflineProgressPopup from "./components/OfflineProgressPopup";
 import BottomNav from "./components/BottomNav";
 import EndlessTowerPanel from "./components/EndlessTowerPanel";
+import NpcPanel from "./components/NpcPanel";
 import { loadGame, useAutoSave } from "./game/useSaveGame";
 import { useLevelUp } from "./game/useLevelUp";
 import { useBossFight } from "./game/useBossFight";
@@ -157,7 +158,10 @@ function App() {
         )}
 
         {activeTab === "world" && (
-          <WorldMapPanel gameState={gameState} currentAreaId={currentAreaId} setCurrentAreaId={setCurrentAreaId} />
+          <>
+            <WorldMapPanel gameState={gameState} currentAreaId={currentAreaId} setCurrentAreaId={setCurrentAreaId} />
+            <NpcPanel />
+          </>
         )}
 
         {activeTab === "progress" && (
