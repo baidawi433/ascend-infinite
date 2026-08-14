@@ -24,7 +24,8 @@ export const initialGameState = {
   lastSeenTimestamp: Date.now(),
   critChance: 0.1,
   critMultiplier: 2,
-  highestTowerFloor: 0, // rekor lantai tertinggi yang pernah dicapai
+  highestTowerFloor: 0,
+  sfxEnabled: true,
 };
 
 export const ASCENSION_LEVEL_REQUIREMENT = 20;

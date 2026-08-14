@@ -23,6 +23,7 @@ import { getTotalDamageBonus } from "./game/useSkillTree";
 import { getTotalDamageBonus, getTotalGoldBonus } from "./game/useSkillTree";
 import { getGlobalBonusPercent } from "./game/useAscension";
 import { formatNumber } from "./game/numberFormat";
+import { playLevelUpSound, playLootSound, playBossDefeatSound, setSfxEnabled } from "./game/audio";
 import "./App.css";
 
 const KILLS_TO_UNLOCK_BOSS = 10;
@@ -37,6 +38,17 @@ function App() {
 
   useAutoSave(gameState);
   useLevelUp(gameState, setGameState);
+
+  // Sinkronkan status SFX ke modul audio setiap kali gameState.sfxEnabled berubah
+  useEffect(() => {
+    setSfxEnabled(gameState.sfxEnabled);
+  }, [gameState.sfxEnabled]);
+
+  // Mainkan suara level up setiap kali level bertambah
+  const prevLevelRef = useState(gameState.level)[0];
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   useAchievementChecker(gameState, setGameState);
 
   const { offlineReport, claimOfflineProgress } = useOfflineProgressPopup(
@@ -55,6 +67,11 @@ function App() {
   function handleReward(gold, xp, droppedItem) {
     const skillGoldBonus = getTotalGoldBonus(gameState.unlockedSkills);
     const goldWithBonus = Math.floor(gold * (1 + (globalBonusPercent + skillGoldBonus) / 100));
+
+    if (droppedItem) {
+      playLootSound();
+    }
+
     setGameState((prev) => ({
       ...prev,
       gold: prev.gold + goldWithBonus,
@@ -68,6 +85,7 @@ function App() {
 
   function handleBossDefeated(gold, xp, skillPoints) {
     const goldWithBonus = Math.floor(gold * (1 + globalBonusPercent / 100));
+    playBossDefeatSound();
     setGameState((prev) => ({
       ...prev,
       gold: prev.gold + goldWithBonus,

@@ -4,6 +4,7 @@ import { useCombat } from "../game/useCombat";
 import { useAutoAttack } from "../game/useAutoAttack";
 import FloatingDamageNumber from "./FloatingDamageNumber";
 import { formatNumber } from "../game/numberFormat";
+import { playAttackSound, playCriticalSound } from "../game/audio";
 
 function CombatScreen({ damage, areaId, onReward, autoAttackEnabled, critChance, critMultiplier }) {
   const [floatingNumbers, setFloatingNumbers] = useState([]);
@@ -11,6 +12,12 @@ function CombatScreen({ damage, areaId, onReward, autoAttackEnabled, critChance,
   const handleDamageDealt = useCallback((dmg, isCritical) => {
     const numberId = `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
     setFloatingNumbers((prev) => [...prev, { id: numberId, damage: dmg, isCritical }]);
+
+    if (isCritical) {
+      playCriticalSound();
+    } else {
+      playAttackSound();
+    }
   }, []);
 
   const removeFloatingNumber = useCallback((id) => {
