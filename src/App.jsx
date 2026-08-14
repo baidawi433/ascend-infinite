@@ -98,9 +98,9 @@ function App() {
 
   return (
     <div style={{ color: "white", background: "#0a0a1a", minHeight: "100vh", paddingBottom: "70px", fontFamily: "sans-serif" }}>
-      <div style={{ padding: "20px 20px 0 20px" }}>
-        <h1 style={{ marginBottom: "10px" }}>⚔️ ASCEND: INFINITE</h1>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "12px", fontSize: "14px", color: "#ccc", marginBottom: "10px" }}>
+      <div className="game-header">
+        <h1 className="game-title">⚔️ ASCEND: INFINITE</h1>
+        <div className="stat-bar" style={{ marginBottom: "10px" }}>
           <span>Lv.{formatNumber(gameState.level)}</span>
           <span>🪙 {formatNumber(gameState.gold)}</span>
           <span>✨ {formatNumber(gameState.xp)}/{formatNumber(xpNeeded)}</span>
