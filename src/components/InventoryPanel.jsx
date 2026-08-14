@@ -21,22 +21,21 @@ function InventoryPanel({ gameState, setGameState }) {
   }
 
   return (
-    <div style={{ marginTop: "20px", padding: "20px", border: "1px solid #333", borderRadius: "8px", maxWidth: "400px" }}>
-      <h3>🎒 Inventory</h3>
+    <div className="panel-card">
+      <h3 style={{ marginTop: 0 }}>🎒 Inventory</h3>
 
-      <div style={{ marginBottom: "12px", padding: "8px", background: "#1a1a2a", borderRadius: "6px" }}>
-        <strong>Equipped: </strong>
+      <div style={{ marginBottom: "12px", padding: "10px", background: "#1a1a2a", borderRadius: "8px", border: "1px solid var(--color-border)" }}>
+        <strong style={{ fontSize: "13px" }}>Equipped: </strong>
         {gameState.equippedWeapon ? (
           <span style={{ color: rarityConfig[gameState.equippedWeapon.rarity].color }}>
             {gameState.equippedWeapon.name} (+{gameState.equippedWeapon.damageBonus} Dmg)
           </span>
         ) : (
-          <span style={{ color: "#888" }}>None</span>
+          <span style={{ color: "var(--color-text-muted)" }}>None</span>
         )}
       </div>
 
-      {/* Panel Fusion - tampilkan tombol fusion untuk tiap rarity yang bisa di-fuse */}
-      <div style={{ marginBottom: "12px", padding: "8px", background: "#1a1a2a", borderRadius: "6px" }}>
+      <div style={{ marginBottom: "12px", padding: "10px", background: "#1a1a2a", borderRadius: "8px", border: "1px solid var(--color-border)" }}>
         <strong style={{ fontSize: "13px" }}>⚗️ Fusion</strong>
         {rarityOrder.slice(0, -1).map((rarity) => {
           const config = rarityConfig[rarity];
@@ -56,7 +55,7 @@ function InventoryPanel({ gameState, setGameState }) {
               <button
                 onClick={() => handleFuse(rarity)}
                 disabled={!ready}
-                style={{ padding: "4px 10px", background: ready ? "#8e44ad" : "#444", color: "white", border: "none", borderRadius: "4px", cursor: ready ? "pointer" : "not-allowed", fontSize: "11px" }}
+                style={{ padding: "4px 10px", background: ready ? "var(--color-accent-purple)" : "#444", color: "white", border: "none", borderRadius: "5px", cursor: ready ? "pointer" : "not-allowed", fontSize: "11px" }}
               >
                 Fuse
               </button>
@@ -66,7 +65,7 @@ function InventoryPanel({ gameState, setGameState }) {
       </div>
 
       {gameState.inventory.length === 0 && (
-        <p style={{ color: "#888" }}>No items yet. Defeat enemies for a chance to find loot.</p>
+        <p style={{ color: "var(--color-text-muted)", fontSize: "13px" }}>No items yet. Defeat enemies for a chance to find loot.</p>
       )}
 
       {gameState.inventory.map((item) => {
@@ -79,12 +78,12 @@ function InventoryPanel({ gameState, setGameState }) {
             style={{
               display: "flex", justifyContent: "space-between", alignItems: "center",
               padding: "8px", marginBottom: "6px", background: "#141420",
-              borderRadius: "6px", borderLeft: `4px solid ${config.color}`,
+              borderRadius: "8px", borderLeft: `4px solid ${config.color}`,
             }}
           >
             <div>
               <strong style={{ color: config.color }}>{item.name}</strong>
-              <p style={{ margin: 0, fontSize: "12px", color: "#888" }}>
+              <p style={{ margin: 0, fontSize: "12px", color: "var(--color-text-muted)" }}>
                 {config.label} · +{item.damageBonus} Dmg
               </p>
             </div>
@@ -92,13 +91,13 @@ function InventoryPanel({ gameState, setGameState }) {
               <button
                 onClick={() => handleEquip(item)}
                 disabled={isEquipped}
-                style={{ padding: "4px 10px", background: isEquipped ? "#444" : "#27ae60", color: "white", border: "none", borderRadius: "4px", cursor: isEquipped ? "default" : "pointer", fontSize: "12px" }}
+                style={{ padding: "4px 10px", background: isEquipped ? "#444" : "var(--color-success)", color: "white", border: "none", borderRadius: "5px", cursor: isEquipped ? "default" : "pointer", fontSize: "12px" }}
               >
                 {isEquipped ? "Equipped" : "Equip"}
               </button>
               <button
                 onClick={() => handleSell(item)}
-                style={{ padding: "4px 10px", background: "#c0392b", color: "white", border: "none", borderRadius: "4px", cursor: "pointer", fontSize: "12px" }}
+                style={{ padding: "4px 10px", background: "var(--color-danger)", color: "white", border: "none", borderRadius: "5px", cursor: "pointer", fontSize: "12px" }}
               >
                 Sell ({item.sellPrice}g)
               </button>

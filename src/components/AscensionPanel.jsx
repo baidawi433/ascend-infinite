@@ -17,25 +17,25 @@ function AscensionPanel({ gameState, setGameState }) {
   }
 
   return (
-    <div style={{ marginTop: "20px", padding: "20px", border: "1px solid #f1c40f", borderRadius: "8px", maxWidth: "400px" }}>
-      <h3>🌟 Ascension</h3>
-      <p>Soul: {gameState.soul}</p>
-      <p>Ascension Point: {gameState.ascensionPoint}</p>
-      <p>Total Ascensions: {gameState.ascensionCount}</p>
-      <p>Current Global Bonus: +{currentBonus}% Damage & Gold</p>
+    <div className="panel-card" style={{ border: "1px solid var(--color-accent-gold)" }}>
+      <h3 style={{ marginTop: 0 }}>🌟 Ascension</h3>
+      <p style={{ fontSize: "13px" }}>Soul: {gameState.soul}</p>
+      <p style={{ fontSize: "13px" }}>Ascension Point: {gameState.ascensionPoint}</p>
+      <p style={{ fontSize: "13px" }}>Total Ascensions: {gameState.ascensionCount}</p>
+      <p style={{ color: "var(--color-accent-gold)" }}>Current Global Bonus: +{currentBonus}% Damage & Gold</p>
 
       {ready ? (
         <>
-          <p style={{ color: "#f1c40f" }}>✨ Ascension Ready! Next bonus: +{nextBonus}%</p>
+          <p style={{ color: "var(--color-accent-gold)" }}>✨ Ascension Ready! Next bonus: +{nextBonus}%</p>
           <button
             onClick={handleAscend}
-            style={{ padding: "10px 20px", background: "#f1c40f", color: "#000", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "16px", fontWeight: "bold" }}
+            style={{ padding: "10px 20px", background: "var(--color-accent-gold)", color: "#000", border: "none", borderRadius: "8px", cursor: "pointer", fontSize: "16px", fontWeight: "bold" }}
           >
             🌟 ASCEND
           </button>
         </>
       ) : (
-        <p style={{ color: "#888" }}>
+        <p style={{ color: "var(--color-text-muted)" }}>
           Requires Level {ASCENSION_LEVEL_REQUIREMENT} (Current: {gameState.level})
         </p>
       )}
