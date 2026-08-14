@@ -1,0 +1,177 @@
+// App.jsx
+import { useState, useEffect } from "react";
+import CombatScreen from "./components/CombatScreen";
+import BossScreen from "./components/BossScreen";
+import UpgradePanel from "./components/UpgradePanel";
+import SkillTreePanel from "./components/SkillTreePanel";
+import WorldMapPanel from "./components/WorldMapPanel";
+import AscensionPanel from "./components/AscensionPanel";
+import InventoryPanel from "./components/InventoryPanel";
+import QuestPanel from "./components/QuestPanel";
+import SettingsPanel from "./components/SettingsPanel";
+import OfflineProgressPopup from "./components/OfflineProgressPopup";
+import BottomNav from "./components/BottomNav";
+import { loadGame, useAutoSave } from "./game/useSaveGame";
+import { useLevelUp } from "./game/useLevelUp";
+import { useBossFight } from "./game/useBossFight";
+import { useAchievementChecker } from "./game/useQuestsAndAchievements";
+import { useOfflineProgressPopup } from "./game/useOfflineProgress";
+import { getXpToNextLevel } from "./game/formulas";
+import { getTotalDamageBonus } from "./game/useSkillTree";
+import { getTotalDamageBonus, getTotalGoldBonus } from "./game/useSkillTree";
+import { getGlobalBonusPercent } from "./game/useAscension";
+import { formatNumber } from "./game/numberFormat";
+import "./App.css";
+
+const KILLS_TO_UNLOCK_BOSS = 10;
+const AVERAGE_GOLD_PER_KILL = 8;
+const AVERAGE_XP_PER_KILL = 4;
+
+function App() {
+  const [gameState, setGameState] = useState(loadGame());
+  const [currentAreaId, setCurrentAreaId] = useState("whispering_forest");
+  const [isBossActive, setIsBossActive] = useState(false);
+  const [activeTab, setActiveTab] = useState("battle");
+
+  useAutoSave(gameState);
+  useLevelUp(gameState, setGameState);
+  useAchievementChecker(gameState, setGameState);
+
+  const { offlineReport, claimOfflineProgress } = useOfflineProgressPopup(
+    gameState, setGameState, AVERAGE_GOLD_PER_KILL, AVERAGE_XP_PER_KILL
+  );
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setGameState((prev) => ({ ...prev, lastSeenTimestamp: Date.now() }));
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [setGameState]);
+
+  const globalBonusPercent = getGlobalBonusPercent(gameState.ascensionCount);
+
+  function handleReward(gold, xp, droppedItem) {
+    const skillGoldBonus = getTotalGoldBonus(gameState.unlockedSkills);
+    const goldWithBonus = Math.floor(gold * (1 + (globalBonusPercent + skillGoldBonus) / 100));
+    setGameState((prev) => ({
+      ...prev,
+      gold: prev.gold + goldWithBonus,
+      xp: prev.xp + xp,
+      killCount: prev.killCount + 1,
+      totalKills: prev.totalKills + 1,
+      totalGoldEarned: prev.totalGoldEarned + goldWithBonus,
+      inventory: droppedItem ? [...prev.inventory, droppedItem] : prev.inventory,
+    }));
+  }
+
+  function handleBossDefeated(gold, xp, skillPoints) {
+    const goldWithBonus = Math.floor(gold * (1 + globalBonusPercent / 100));
+    setGameState((prev) => ({
+      ...prev,
+      gold: prev.gold + goldWithBonus,
+      xp: prev.xp + xp,
+      skillPoint: prev.skillPoint + skillPoints,
+      killCount: 0,
+      totalKills: prev.totalKills + 1,
+      totalGoldEarned: prev.totalGoldEarned + goldWithBonus,
+      bossesDefeated: [...prev.bossesDefeated, currentAreaId],
+    }));
+    setIsBossActive(false);
+  }
+
+  function toggleAutoAttack() {
+    setGameState((prev) => ({ ...prev, autoAttackEnabled: !prev.autoAttackEnabled }));
+  }
+
+  const xpNeeded = getXpToNextLevel(gameState.level);
+  const skillDamageBonusPercent = getTotalDamageBonus(gameState.unlockedSkills);
+  const totalDamageBonusPercent = skillDamageBonusPercent + globalBonusPercent;
+  const equipmentDamageBonus = gameState.equippedWeapon?.damageBonus || 0;
+
+  const effectiveDamage = Math.floor(
+    (gameState.damage + equipmentDamageBonus) * (1 + totalDamageBonusPercent / 100)
+  );
+
+  const { boss, attackBoss } = useBossFight(effectiveDamage, currentAreaId, isBossActive, handleBossDefeated);
+  const canChallengeBoss = gameState.killCount >= KILLS_TO_UNLOCK_BOSS && !isBossActive;
+
+  return (
+    <div style={{ color: "white", background: "#0a0a1a", minHeight: "100vh", paddingBottom: "70px", fontFamily: "sans-serif" }}>
+      <div style={{ padding: "20px 20px 0 20px" }}>
+        <h1 style={{ marginBottom: "10px" }}>⚔️ ASCEND: INFINITE</h1>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "12px", fontSize: "14px", color: "#ccc", marginBottom: "10px" }}>
+          <span>Lv.{formatNumber(gameState.level)}</span>
+          <span>🪙 {formatNumber(gameState.gold)}</span>
+          <span>✨ {formatNumber(gameState.xp)}/{formatNumber(xpNeeded)}</span>
+          <span>🌟 {formatNumber(gameState.skillPoint)} SP</span>
+        </div>
+      </div>
+
+      <div style={{ padding: "0 20px" }}>
+        {activeTab === "battle" && (
+          <>
+            <button
+              onClick={toggleAutoAttack}
+              style={{
+                marginBottom: "10px", padding: "8px 16px",
+                background: gameState.autoAttackEnabled ? "#27ae60" : "#333",
+                color: "white", border: "none", borderRadius: "6px", cursor: "pointer"
+              }}
+            >
+              🤖 Auto Attack: {gameState.autoAttackEnabled ? "ON" : "OFF"}
+            </button>
+
+            {!isBossActive && (
+              <CombatScreen
+                damage={effectiveDamage}
+                areaId={currentAreaId}
+                onReward={handleReward}
+                autoAttackEnabled={gameState.autoAttackEnabled}
+                critChance={gameState.critChance}
+                critMultiplier={gameState.critMultiplier}
+              />
+            )}
+
+            {canChallengeBoss && (
+              <button
+                onClick={() => setIsBossActive(true)}
+                style={{ marginTop: "15px", padding: "10px 20px", background: "#e74c3c", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "16px" }}
+              >
+                🔥 Challenge Boss!
+              </button>
+            )}
+
+            {isBossActive && <BossScreen boss={boss} attackBoss={attackBoss} />}
+
+            <UpgradePanel gameState={gameState} setGameState={setGameState} />
+          </>
+        )}
+
+        {activeTab === "skills" && (
+          <SkillTreePanel gameState={gameState} setGameState={setGameState} />
+        )}
+
+        {activeTab === "inventory" && (
+          <InventoryPanel gameState={gameState} setGameState={setGameState} />
+        )}
+
+        {activeTab === "world" && (
+          <WorldMapPanel gameState={gameState} currentAreaId={currentAreaId} setCurrentAreaId={setCurrentAreaId} />
+        )}
+
+        {activeTab === "progress" && (
+          <>
+            <AscensionPanel gameState={gameState} setGameState={setGameState} />
+            <QuestPanel gameState={gameState} setGameState={setGameState} />
+            <SettingsPanel gameState={gameState} setGameState={setGameState} />
+          </>
+        )}
+      </div>
+
+      <OfflineProgressPopup offlineReport={offlineReport} onClaim={claimOfflineProgress} />
+      <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
+    </div>
+  );
+}
+
+export default App;
