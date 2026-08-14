@@ -1,19 +1,49 @@
 // SkillTreePanel.jsx
 import { skillList } from "../game/skills";
 import { canUnlockSkill, unlockSkill } from "../game/useSkillTree";
+import { canRespec, performRespec, RESPEC_COST } from "../game/useRespec";
+import { formatNumber } from "../game/numberFormat";
 
 const branches = ["Strength", "Agility", "Greed", "Vitality"];
 const branchEmoji = { Strength: "⚔️", Agility: "⚡", Greed: "💰", Vitality: "🛡️" };
 const branchColor = { Strength: "#e74c3c", Agility: "#3498db", Greed: "#f1c40f", Vitality: "#27ae60" };
 
 function SkillTreePanel({ gameState, setGameState }) {
+  const respecReady = canRespec(gameState);
+
+  function handleRespec() {
+    const confirmed = window.confirm(
+      `Reset Skill Tree seharga ${RESPEC_COST} Gold?\n\nSemua skill yang terbuka akan dikunci kembali, tetapi Skill Point yang sudah kamu pakai akan dikembalikan sepenuhnya.`
+    );
+    if (confirmed) {
+      performRespec(gameState, setGameState);
+    }
+  }
+
   return (
     <div className="panel-card">
-      <h3 style={{ marginTop: 0 }}>🌳 Skill Tree</h3>
-      <p style={{ color: "var(--color-accent-gold)", fontSize: "14px" }}>Skill Point: {gameState.skillPoint}</p>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "8px" }}>
+        <div>
+          <h3 style={{ marginTop: 0, marginBottom: "4px" }}>🌳 Skill Tree</h3>
+          <p style={{ color: "var(--color-accent-gold)", fontSize: "14px", margin: 0 }}>Skill Point: {gameState.skillPoint}</p>
+        </div>
+        <button
+          onClick={handleRespec}
+          disabled={!respecReady}
+          style={{
+            padding: "8px 14px",
+            background: respecReady ? "var(--color-danger)" : "#444",
+            color: "white", border: "none", borderRadius: "6px",
+            cursor: respecReady ? "pointer" : "not-allowed",
+            fontSize: "12px", whiteSpace: "nowrap",
+          }}
+        >
+          🔄 Reset Build ({formatNumber(RESPEC_COST)}g)
+        </button>
+      </div>
 
       {branches.map((branch) => (
-        <div key={branch} style={{ marginBottom: "18px" }}>
+        <div key={branch} style={{ marginTop: "18px", marginBottom: "18px" }}>
           <h4 style={{ marginBottom: "8px", color: branchColor[branch], borderBottom: `1px solid ${branchColor[branch]}44`, paddingBottom: "4px" }}>
             {branchEmoji[branch]} {branch}
           </h4>
