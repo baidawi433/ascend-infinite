@@ -22,8 +22,9 @@ export const initialGameState = {
   unlockedAchievements: [],
   autoAttackEnabled: false,
   lastSeenTimestamp: Date.now(),
-  critChance: 0.1,     // 10% peluang critical hit
-  critMultiplier: 2,   // critical hit = 2x damage normal
+  critChance: 0.1,
+  critMultiplier: 2,
+  highestTowerFloor: 0, // rekor lantai tertinggi yang pernah dicapai
 };
 
 export const ASCENSION_LEVEL_REQUIREMENT = 20;

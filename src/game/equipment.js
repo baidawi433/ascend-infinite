@@ -1,5 +1,7 @@
 // equipment.js
-// Data equipment dasar dengan rarity dan drop chance
+// Data equipment dengan rarity, drop chance, dan aturan fusion
+
+export const rarityOrder = ["common", "rare", "epic", "legendary", "mythic"];
 
 export const rarityConfig = {
   common:    { label: "Common",    color: "#9e9e9e", dropChance: 0.70, sellPrice: 5,   damageBonus: 2 },
@@ -9,9 +11,16 @@ export const rarityConfig = {
   mythic:    { label: "Mythic",    color: "#e74c3c", dropChance: 0.002, sellPrice: 800, damageBonus: 100 },
 };
 
+// Berapa item dibutuhkan untuk fusion ke rarity berikutnya
+export const fusionRequirement = {
+  common: 3,   // 3 Common -> 1 Rare
+  rare: 5,     // 5 Rare -> 1 Epic
+  epic: 5,     // 5 Epic -> 1 Legendary
+  legendary: 5, // 5 Legendary -> 1 Mythic
+};
+
 const weaponNames = ["Rusty Sword", "Iron Blade", "Flame Sword", "Void Staff", "Storm Axe"];
 
-// Menggulung dadu rarity berdasarkan dropChance, lalu buat item baru
 export function rollItemDrop() {
   const roll = Math.random();
   let cumulative = 0;
@@ -32,6 +41,20 @@ export function rollItemDrop() {
     instanceId: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
     name,
     rarity: chosenRarity,
+    damageBonus: config.damageBonus,
+    sellPrice: config.sellPrice,
+  };
+}
+
+// Membuat item hasil fusion dengan rarity yang lebih tinggi
+export function createFusedItem(newRarity) {
+  const config = rarityConfig[newRarity];
+  const name = weaponNames[Math.floor(Math.random() * weaponNames.length)];
+
+  return {
+    instanceId: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    name: `${config.label} ${name}`,
+    rarity: newRarity,
     damageBonus: config.damageBonus,
     sellPrice: config.sellPrice,
   };

@@ -11,6 +11,7 @@ import QuestPanel from "./components/QuestPanel";
 import SettingsPanel from "./components/SettingsPanel";
 import OfflineProgressPopup from "./components/OfflineProgressPopup";
 import BottomNav from "./components/BottomNav";
+import EndlessTowerPanel from "./components/EndlessTowerPanel";
 import { loadGame, useAutoSave } from "./game/useSaveGame";
 import { useLevelUp } from "./game/useLevelUp";
 import { useBossFight } from "./game/useBossFight";
@@ -162,6 +163,7 @@ function App() {
         {activeTab === "progress" && (
           <>
             <AscensionPanel gameState={gameState} setGameState={setGameState} />
+            <EndlessTowerPanel damage={effectiveDamage} gameState={gameState} setGameState={setGameState} />
             <QuestPanel gameState={gameState} setGameState={setGameState} />
             <SettingsPanel gameState={gameState} setGameState={setGameState} />
           </>
