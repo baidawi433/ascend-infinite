@@ -4,7 +4,6 @@ import { useCombat } from "../game/useCombat";
 import { useAutoAttack } from "../game/useAutoAttack";
 import FloatingDamageNumber from "./FloatingDamageNumber";
 import BattleArena from "./BattleArena";
-import { formatNumber } from "../game/numberFormat";
 import { playAttackSound, playCriticalSound } from "../game/audio";
 
 const enemyEmojiMap = {
@@ -53,10 +52,8 @@ function CombatScreen({ damage, areaId, onReward, autoAttackEnabled, critChance,
 
   useAutoAttack(autoAttackEnabled, attackEnemy);
 
-  const hpPercent = Math.max(0, (enemy.currentHp / enemy.hp) * 100);
   const enemyEmoji = enemyEmojiMap[enemy.id] || "👹";
 
-  // Deteksi musuh mati (HP mendekati 0 sesaat sebelum diganti musuh baru) untuk trigger animasi death
   const prevEnemyIdRef = useRef(enemy.id);
   useEffect(() => {
     if (enemy.currentHp <= 0 && !isDying) {
@@ -69,38 +66,25 @@ function CombatScreen({ damage, areaId, onReward, autoAttackEnabled, critChance,
   }, [enemy, isDying]);
 
   return (
-    <div className="panel-card" style={{ position: "relative", overflow: "hidden" }}>
-      <h3 style={{ marginTop: 0 }}>👹 {enemy.name}</h3>
-
+    <div style={{ position: "relative" }}>
       <BattleArena
+        enemyName={enemy.name}
         enemyEmoji={enemyEmoji}
         enemyKey={enemy.id + enemy.hp}
+        enemyHp={enemy.currentHp}
+        enemyMaxHp={enemy.hp}
         isCritical={isCritical}
         isDying={isDying}
         triggerAttackId={attackTrigger}
         areaId={areaId}
       />
 
-      <div style={{ background: "#0a0a12", borderRadius: "6px", overflow: "hidden", height: "22px", marginBottom: "10px", border: "1px solid #2a2a3a" }}>
-        <div
-          className="hp-bar-glow"
-          style={{
-            width: `${hpPercent}%`,
-            background: "linear-gradient(90deg, #e74c3c, #c0392b)",
-            height: "100%",
-            transition: "width 0.15s ease",
-          }}
-        />
+      {/* FAB Attack button - mengambang di bawah tengah arena, sedikit overlap */}
+      <div style={{ display: "flex", justifyContent: "center", marginTop: "-32px", position: "relative", zIndex: 10 }}>
+        <button onClick={attackEnemy} className="fab-attack">
+          ⚔️
+        </button>
       </div>
-      <p style={{ fontSize: "13px", color: "var(--color-text-muted)" }}>
-        {formatNumber(enemy.currentHp)} / {formatNumber(enemy.hp)} HP
-      </p>
-      <button
-        onClick={attackEnemy}
-        style={{ padding: "12px 24px", background: "var(--color-accent-purple)", color: "white", border: "none", borderRadius: "8px", cursor: "pointer", fontSize: "16px", fontWeight: "bold" }}
-      >
-        ⚔️ Attack
-      </button>
 
       {floatingNumbers.map((n) => (
         <FloatingDamageNumber

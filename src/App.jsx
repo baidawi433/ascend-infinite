@@ -145,10 +145,10 @@ function App() {
       <div className="game-header">
         <h1 className="game-title">⚔️ ASCEND: INFINITE</h1>
         <div className="stat-bar" style={{ marginBottom: "10px" }}>
-          <span>Lv.{formatNumber(gameState.level)}</span>
-          <span>🪙 {formatNumber(gameState.gold)}</span>
-          <span>✨ {formatNumber(gameState.xp)}/{formatNumber(xpNeeded)}</span>
-          <span>🌟 {formatNumber(gameState.skillPoint)} SP</span>
+          <span className="hud-pill" style={{ color: "var(--color-accent-purple)" }}>⭐ Lv.{formatNumber(gameState.level)}</span>
+          <span className="hud-pill" style={{ color: "var(--color-accent-gold)" }}>🪙 {formatNumber(gameState.gold)}</span>
+          <span className="hud-pill" style={{ color: "var(--color-accent-cyan)" }}>✨ {formatNumber(gameState.xp)}/{formatNumber(xpNeeded)}</span>
+          <span className="hud-pill" style={{ color: "var(--color-success)" }}>🌟 {formatNumber(gameState.skillPoint)}</span>
         </div>
       </div>
 

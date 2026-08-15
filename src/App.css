@@ -1,16 +1,15 @@
 /* App.css */
-/* Layout dan spacing umum untuk struktur halaman */
 
 .game-header {
-  padding: 20px 20px 0 20px;
-  border-bottom: 1px solid var(--color-border);
-  padding-bottom: 12px;
+  padding: 18px 20px 0 20px;
 }
 
 .game-title {
-  margin: 0 0 10px 0;
-  font-size: 28px;
-  background: linear-gradient(90deg, #8e44ad, #3498db);
+  margin: 0 0 12px 0;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  background: linear-gradient(90deg, #a855f7, #22d3ee);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -19,16 +18,17 @@
 .stat-bar {
   display: flex;
   flex-wrap: wrap;
-  gap: 14px;
-  font-size: 14px;
-  color: #ccc;
+  gap: 8px;
 }
 
 .panel-card {
-  padding: 20px;
-  border-radius: 10px;
-  max-width: 400px;
+  padding: 18px;
+  border-radius: var(--radius-lg);
+  max-width: 420px;
   background: var(--color-bg-panel);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--color-border);
-  margin-top: 16px;
+  margin-top: 14px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }

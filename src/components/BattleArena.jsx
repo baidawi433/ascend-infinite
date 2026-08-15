@@ -1,10 +1,11 @@
 // BattleArena.jsx
-// Menampilkan karakter dan musuh sebagai "sprite" visual besar dengan animasi
+// Arena full-bleed dengan radial HP ring di sekeliling musuh
 
 import { useState, useEffect, useRef } from "react";
 import { getAreaThemeColor } from "../game/areas";
+import { formatNumber } from "../game/numberFormat";
 
-function BattleArena({ enemyEmoji, enemyKey, isCritical, isDying, triggerAttackId, areaId }) {
+function BattleArena({ enemyName, enemyEmoji, enemyKey, enemyHp, enemyMaxHp, isCritical, isDying, triggerAttackId, areaId }) {
   const [playerAnim, setPlayerAnim] = useState("sprite-idle");
   const [enemyAnim, setEnemyAnim] = useState("sprite-idle");
   const prevAttackId = useRef(triggerAttackId);
@@ -12,50 +13,75 @@ function BattleArena({ enemyEmoji, enemyKey, isCritical, isDying, triggerAttackI
   useEffect(() => {
     if (triggerAttackId !== prevAttackId.current) {
       prevAttackId.current = triggerAttackId;
-
       setPlayerAnim("sprite-attacking");
       setEnemyAnim("sprite-hit");
-
       const timeout = setTimeout(() => {
         setPlayerAnim("sprite-idle");
         setEnemyAnim("sprite-idle");
       }, 350);
-
       return () => clearTimeout(timeout);
     }
   }, [triggerAttackId]);
 
   const themeColor = getAreaThemeColor(areaId);
+  const hpPercent = Math.max(0, Math.min(100, (enemyHp / enemyMaxHp) * 100));
+
+  // Radial ring pakai conic-gradient: merah untuk HP terisi, gelap untuk sisa
+  const ringStyle = {
+    background: `conic-gradient(#f43f5e ${hpPercent}%, rgba(255,255,255,0.08) ${hpPercent}%)`,
+  };
 
   return (
     <div
       className={isCritical ? "screen-shake" : ""}
       style={{
-        display: "flex",
-        justifyContent: "space-around",
-        alignItems: "center",
-        padding: "20px 10px",
-        background: `radial-gradient(ellipse at center, ${themeColor} 0%, #0a0a12 100%)`,
-        borderRadius: "10px",
-        marginBottom: "12px",
-        minHeight: "140px",
         position: "relative",
+        background: `radial-gradient(ellipse at center, ${themeColor} 0%, #05050f 100%)`,
+        borderRadius: "var(--radius-lg)",
+        marginTop: "8px",
+        minHeight: "260px",
         overflow: "hidden",
         transition: "background 0.4s ease",
       }}
     >
-      <div className={playerAnim} style={{ fontSize: "56px", filter: "drop-shadow(0 4px 8px rgba(142,68,173,0.5))" }}>
-        🧙
+      {/* Nama & HP musuh mengambang di atas */}
+      <div style={{ position: "absolute", top: "16px", left: 0, right: 0, textAlign: "center" }}>
+        <div style={{ fontSize: "14px", fontWeight: 700 }}>{enemyName}</div>
+        <div style={{ fontSize: "11px", color: "var(--color-text-muted)" }}>
+          {formatNumber(enemyHp)} / {formatNumber(enemyMaxHp)} HP
+        </div>
       </div>
 
-      <div style={{ fontSize: "14px", color: "var(--color-text-muted)", fontWeight: "bold" }}>VS</div>
+      {/* Arena tengah: player - vs - enemy dengan radial ring */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-around", height: "260px", padding: "0 10px" }}>
+        <div className={playerAnim} style={{ fontSize: "60px", filter: "drop-shadow(0 6px 10px rgba(168,85,247,0.5))" }}>
+          🧙
+        </div>
 
-      <div
-        key={enemyKey}
-        className={isDying ? "sprite-dying" : `${enemyAnim} sprite-spawning`}
-        style={{ fontSize: "56px", filter: "drop-shadow(0 4px 8px rgba(231,76,60,0.5))" }}
-      >
-        {enemyEmoji}
+        {/* Enemy dengan radial HP ring di sekelilingnya */}
+        <div
+          key={enemyKey}
+          className={isDying ? "sprite-dying" : "sprite-spawning"}
+          style={{
+            width: "110px", height: "110px", borderRadius: "50%",
+            padding: "5px",
+            ...ringStyle,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            transition: "background 0.15s ease",
+          }}
+        >
+          <div
+            className={enemyAnim}
+            style={{
+              width: "100%", height: "100%", borderRadius: "50%",
+              background: "#05050f",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: "44px",
+            }}
+          >
+            {enemyEmoji}
+          </div>
+        </div>
       </div>
     </div>
   );
