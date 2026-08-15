@@ -5,7 +5,7 @@ import { rarityOrder, fusionRequirement, createFusedItem } from "./equipment";
 
 export function getNextRarity(rarity) {
   const index = rarityOrder.indexOf(rarity);
-  if (index === -1 || index === rarityOrder.length - 1) return null; // sudah rarity tertinggi
+  if (index === -1 || index === rarityOrder.length - 1) return null;
   return rarityOrder[index + 1];
 }
 
@@ -28,9 +28,10 @@ export function fuseItems(rarity, gameState, setGameState) {
 
   if (itemsOfRarity.length < requiredCount) return;
 
-  // Ambil sejumlah item yang dibutuhkan untuk dihapus
   const idsToRemove = itemsOfRarity.slice(0, requiredCount).map((item) => item.instanceId);
-  const newItem = createFusedItem(nextRarity);
+  // Hasil fusion memakai slot dari item pertama yang dipakai (item-item lain dianggap "bahan")
+  const resultSlot = itemsOfRarity[0].slot;
+  const newItem = createFusedItem(nextRarity, resultSlot);
 
   setGameState((prev) => ({
     ...prev,

@@ -1,19 +1,34 @@
 // InventoryPanel.jsx
-import { rarityConfig, rarityOrder, fusionRequirement } from "../game/equipment";
+import { rarityConfig, rarityOrder, fusionRequirement, slotList, slotConfig } from "../game/equipment";
 import { canFuse, fuseItems, getNextRarity } from "../game/useFusion";
 
 function InventoryPanel({ gameState, setGameState }) {
   function handleEquip(item) {
-    setGameState((prev) => ({ ...prev, equippedWeapon: item }));
+    setGameState((prev) => ({
+      ...prev,
+      equippedItems: { ...prev.equippedItems, [item.slot]: item },
+    }));
+  }
+
+  function handleUnequip(slot) {
+    setGameState((prev) => ({
+      ...prev,
+      equippedItems: { ...prev.equippedItems, [slot]: null },
+    }));
   }
 
   function handleSell(item) {
-    setGameState((prev) => ({
-      ...prev,
-      gold: prev.gold + item.sellPrice,
-      inventory: prev.inventory.filter((i) => i.instanceId !== item.instanceId),
-      equippedWeapon: prev.equippedWeapon?.instanceId === item.instanceId ? null : prev.equippedWeapon,
-    }));
+    setGameState((prev) => {
+      const isEquipped = prev.equippedItems[item.slot]?.instanceId === item.instanceId;
+      return {
+        ...prev,
+        gold: prev.gold + item.sellPrice,
+        inventory: prev.inventory.filter((i) => i.instanceId !== item.instanceId),
+        equippedItems: isEquipped
+          ? { ...prev.equippedItems, [item.slot]: null }
+          : prev.equippedItems,
+      };
+    });
   }
 
   function handleFuse(rarity) {
@@ -24,19 +39,30 @@ function InventoryPanel({ gameState, setGameState }) {
     <div className="panel-card">
       <h3 style={{ marginTop: 0 }}>🎒 Inventory</h3>
 
+      {/* Equipped Items - 7 slot */}
       <div style={{ marginBottom: "12px", padding: "10px", background: "#1a1a2a", borderRadius: "8px", border: "1px solid var(--color-border)" }}>
-        <strong style={{ fontSize: "13px" }}>Equipped: </strong>
-        {gameState.equippedWeapon ? (
-          <span style={{ color: rarityConfig[gameState.equippedWeapon.rarity].color }}>
-            {gameState.equippedWeapon.name} (+{gameState.equippedWeapon.damageBonus} Dmg)
-          </span>
-        ) : (
-          <span style={{ color: "var(--color-text-muted)" }}>None</span>
-        )}
+        <strong style={{ fontSize: "13px" }}>Equipped:</strong>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px", marginTop: "6px" }}>
+          {slotList.map((slot) => {
+            const item = gameState.equippedItems[slot];
+            const slotInfo = slotConfig[slot];
+            return (
+              <div key={slot} style={{ fontSize: "12px", padding: "4px 6px", background: "#141420", borderRadius: "6px" }}>
+                <span>{slotInfo.emoji} </span>
+                {item ? (
+                  <span style={{ color: rarityConfig[item.rarity].color }}>{item.name}</span>
+                ) : (
+                  <span style={{ color: "var(--color-text-muted)" }}>Empty</span>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
 
+      {/* Fusion Panel */}
       <div style={{ marginBottom: "12px", padding: "10px", background: "#1a1a2a", borderRadius: "8px", border: "1px solid var(--color-border)" }}>
-        <strong style={{ fontSize: "13px" }}>⚗️ Fusion</strong>
+        <strong style={{ fontSize: "13px" }}>⚗️ Fusion (per rarity, semua slot digabung)</strong>
         {rarityOrder.slice(0, -1).map((rarity) => {
           const config = rarityConfig[rarity];
           const nextRarity = getNextRarity(rarity);
@@ -70,7 +96,9 @@ function InventoryPanel({ gameState, setGameState }) {
 
       {gameState.inventory.map((item) => {
         const config = rarityConfig[item.rarity];
-        const isEquipped = gameState.equippedWeapon?.instanceId === item.instanceId;
+        const slotInfo = slotConfig[item.slot];
+        const isEquipped = gameState.equippedItems[item.slot]?.instanceId === item.instanceId;
+        const statLabel = item.statType === "damageBonus" ? "Dmg" : "HP";
 
         return (
           <div
@@ -82,19 +110,27 @@ function InventoryPanel({ gameState, setGameState }) {
             }}
           >
             <div>
-              <strong style={{ color: config.color }}>{item.name}</strong>
+              <strong style={{ color: config.color }}>{slotInfo.emoji} {item.name}</strong>
               <p style={{ margin: 0, fontSize: "12px", color: "var(--color-text-muted)" }}>
-                {config.label} · +{item.damageBonus} Dmg
+                {config.label} {slotInfo.label} · +{item.statValue} {statLabel}
               </p>
             </div>
             <div style={{ display: "flex", gap: "6px" }}>
-              <button
-                onClick={() => handleEquip(item)}
-                disabled={isEquipped}
-                style={{ padding: "4px 10px", background: isEquipped ? "#444" : "var(--color-success)", color: "white", border: "none", borderRadius: "5px", cursor: isEquipped ? "default" : "pointer", fontSize: "12px" }}
-              >
-                {isEquipped ? "Equipped" : "Equip"}
-              </button>
+              {isEquipped ? (
+                <button
+                  onClick={() => handleUnequip(item.slot)}
+                  style={{ padding: "4px 10px", background: "#444", color: "white", border: "none", borderRadius: "5px", cursor: "pointer", fontSize: "12px" }}
+                >
+                  Unequip
+                </button>
+              ) : (
+                <button
+                  onClick={() => handleEquip(item)}
+                  style={{ padding: "4px 10px", background: "var(--color-success)", color: "white", border: "none", borderRadius: "5px", cursor: "pointer", fontSize: "12px" }}
+                >
+                  Equip
+                </button>
+              )}
               <button
                 onClick={() => handleSell(item)}
                 style={{ padding: "4px 10px", background: "var(--color-danger)", color: "white", border: "none", borderRadius: "5px", cursor: "pointer", fontSize: "12px" }}

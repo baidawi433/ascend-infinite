@@ -105,11 +105,18 @@ function App() {
   const xpNeeded = getXpToNextLevel(gameState.level);
   const skillDamageBonusPercent = getTotalDamageBonus(gameState.unlockedSkills);
   const totalDamageBonusPercent = skillDamageBonusPercent + globalBonusPercent;
-  const equipmentDamageBonus = gameState.equippedWeapon?.damageBonus || 0;
+  const equipmentDamageBonus = Object.values(gameState.equippedItems)
+    .filter((item) => item && item.statType === "damageBonus")
+    .reduce((total, item) => total + item.statValue, 0);
+
+  const equipmentHpBonus = Object.values(gameState.equippedItems)
+    .filter((item) => item && item.statType === "hpBonus")
+    .reduce((total, item) => total + item.statValue, 0);
 
   const effectiveDamage = Math.floor(
     (gameState.damage + equipmentDamageBonus) * (1 + totalDamageBonusPercent / 100)
   );
+  const effectiveHp = gameState.hp + equipmentHpBonus;
 
   const { boss, attackBoss } = useBossFight(effectiveDamage, currentAreaId, isBossActive, handleBossDefeated);
   const canChallengeBoss = gameState.killCount >= KILLS_TO_UNLOCK_BOSS && !isBossActive;
