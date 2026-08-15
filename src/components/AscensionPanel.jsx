@@ -11,31 +11,48 @@ function AscensionPanel({ gameState, setGameState }) {
     const confirmed = window.confirm(
       "Ascend sekarang? Level, Gold, Damage, dan Skill akan direset, tapi kamu akan mendapat Soul dan bonus permanen selamanya."
     );
-    if (confirmed) {
-      performAscension(gameState, setGameState);
-    }
+    if (confirmed) performAscension(gameState, setGameState);
   }
 
   return (
-    <div className="panel-card" style={{ border: "1px solid var(--color-accent-gold)" }}>
-      <h3 style={{ marginTop: 0 }}>🌟 Ascension</h3>
-      <p style={{ fontSize: "13px" }}>Soul: {gameState.soul}</p>
-      <p style={{ fontSize: "13px" }}>Ascension Point: {gameState.ascensionPoint}</p>
-      <p style={{ fontSize: "13px" }}>Total Ascensions: {gameState.ascensionCount}</p>
-      <p style={{ color: "var(--color-accent-gold)" }}>Current Global Bonus: +{currentBonus}% Damage & Gold</p>
+    <div
+      className="glass-panel"
+      style={{
+        padding: "20px", maxWidth: "420px",
+        background: "linear-gradient(135deg, rgba(251,191,36,0.08), rgba(255,255,255,0.04))",
+        border: "1px solid rgba(251,191,36,0.3)",
+        textAlign: "center",
+      }}
+    >
+      <div style={{ fontSize: "32px", marginBottom: "6px" }}>🌟</div>
+      <h3 style={{ margin: "0 0 12px 0", fontSize: "16px" }}>Ascension</h3>
+
+      <div style={{ display: "flex", justifyContent: "center", gap: "8px", flexWrap: "wrap", marginBottom: "14px" }}>
+        <span className="hud-pill" style={{ fontSize: "11px" }}>✨ {gameState.soul} Soul</span>
+        <span className="hud-pill" style={{ fontSize: "11px" }}>🔹 {gameState.ascensionCount}x</span>
+      </div>
+
+      <div style={{ fontSize: "12px", color: "var(--color-accent-gold)", marginBottom: "14px" }}>
+        Current Bonus: +{currentBonus}%
+      </div>
 
       {ready ? (
         <>
-          <p style={{ color: "var(--color-accent-gold)" }}>✨ Ascension Ready! Next bonus: +{nextBonus}%</p>
+          <p style={{ fontSize: "12px", color: "var(--color-accent-gold)" }}>Ready! Next: +{nextBonus}%</p>
           <button
             onClick={handleAscend}
-            style={{ padding: "10px 20px", background: "var(--color-accent-gold)", color: "#000", border: "none", borderRadius: "8px", cursor: "pointer", fontSize: "16px", fontWeight: "bold" }}
+            style={{
+              padding: "12px 32px", borderRadius: "var(--radius-pill)", border: "none",
+              background: "linear-gradient(135deg, #fbbf24, #f59e0b)",
+              color: "#1a1200", fontWeight: 800, fontSize: "14px", cursor: "pointer",
+              boxShadow: "0 8px 24px rgba(251,191,36,0.4)",
+            }}
           >
-            🌟 ASCEND
+            ASCEND NOW
           </button>
         </>
       ) : (
-        <p style={{ color: "var(--color-text-muted)" }}>
+        <p style={{ color: "var(--color-text-muted)", fontSize: "12px" }}>
           Requires Level {ASCENSION_LEVEL_REQUIREMENT} (Current: {gameState.level})
         </p>
       )}

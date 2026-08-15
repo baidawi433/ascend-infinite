@@ -8,9 +8,7 @@ function SettingsPanel({ gameState, setGameState }) {
   const [message, setMessage] = useState("");
 
   function handleReset() {
-    const confirmed = window.confirm(
-      "RESET ALL PROGRESS?\n\nSemua progress lokal akan dihapus secara permanen. Tindakan ini tidak bisa dibatalkan."
-    );
+    const confirmed = window.confirm("RESET ALL PROGRESS?\n\nSemua progress lokal akan dihapus secara permanen.");
     if (confirmed) {
       setGameState(initialGameState);
       setMessage("Game telah direset.");
@@ -21,9 +19,9 @@ function SettingsPanel({ gameState, setGameState }) {
     const json = JSON.stringify(gameState);
     const code = btoa(encodeURIComponent(json));
     navigator.clipboard.writeText(code).then(() => {
-      setMessage("Save code disalin ke clipboard! Simpan di tempat aman.");
+      setMessage("Save code disalin ke clipboard!");
     }).catch(() => {
-      setMessage("Gagal menyalin otomatis. Salin manual dari kotak di bawah.");
+      setMessage("Gagal menyalin otomatis. Salin manual di bawah.");
     });
     setImportText(code);
   }
@@ -31,11 +29,10 @@ function SettingsPanel({ gameState, setGameState }) {
   function handleImport() {
     try {
       const json = decodeURIComponent(atob(importText.trim()));
-      const parsed = JSON.parse(json);
-      setGameState(parsed);
+      setGameState(JSON.parse(json));
       setMessage("Save berhasil dimuat!");
     } catch {
-      setMessage("Save code tidak valid. Periksa kembali kode yang kamu masukkan.");
+      setMessage("Save code tidak valid.");
     }
   }
 
@@ -43,62 +40,36 @@ function SettingsPanel({ gameState, setGameState }) {
     const newValue = !gameState.sfxEnabled;
     setSfxEnabled(newValue);
     setGameState((prev) => ({ ...prev, sfxEnabled: newValue }));
-    if (newValue) {
-      playAttackSound(); // mainkan contoh suara supaya pemain langsung tahu efeknya
-    }
+    if (newValue) playAttackSound();
   }
 
+  const pillBtn = (bg, color) => ({
+    padding: "10px 18px", borderRadius: "var(--radius-pill)", border: "none",
+    background: bg, color, cursor: "pointer", fontSize: "12px", fontWeight: 700,
+  });
+
   return (
-    <div className="panel-card">
-      <h3 style={{ marginTop: 0 }}>⚙️ Settings</h3>
+    <div className="glass-panel" style={{ padding: "18px", marginTop: "14px", maxWidth: "420px" }}>
+      <h3 style={{ margin: "0 0 14px 0", fontSize: "16px" }}>⚙️ Settings</h3>
 
-      <div style={{ marginBottom: "16px" }}>
-        <button
-          onClick={toggleSfx}
-          style={{
-            padding: "8px 16px",
-            background: gameState.sfxEnabled ? "var(--color-success)" : "#444",
-            color: "white", border: "none", borderRadius: "6px", cursor: "pointer"
-          }}
-        >
-          🔊 SFX: {gameState.sfxEnabled ? "ON" : "OFF"}
+      <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: "14px" }}>
+        <button onClick={toggleSfx} style={pillBtn(gameState.sfxEnabled ? "rgba(52,211,153,0.2)" : "rgba(255,255,255,0.05)", gameState.sfxEnabled ? "#34d399" : "var(--color-text-muted)")}>
+          🔊 SFX {gameState.sfxEnabled ? "ON" : "OFF"}
         </button>
+        <button onClick={handleExport} style={pillBtn("rgba(34,211,238,0.2)", "#22d3ee")}>📤 Export</button>
       </div>
 
-      <div style={{ marginBottom: "16px" }}>
-        <button
-          onClick={handleExport}
-          style={{ padding: "8px 16px", background: "var(--color-accent-cyan)", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", marginRight: "8px" }}
-        >
-          📤 Export Save
-        </button>
-      </div>
+      <textarea
+        value={importText}
+        onChange={(e) => setImportText(e.target.value)}
+        placeholder="Paste save code..."
+        style={{ width: "100%", height: "56px", background: "rgba(255,255,255,0.03)", color: "white", border: "1px solid var(--color-border)", borderRadius: "14px", padding: "10px", fontSize: "11px", resize: "vertical", boxSizing: "border-box", marginBottom: "8px" }}
+      />
+      <button onClick={handleImport} style={{ ...pillBtn("rgba(52,211,153,0.2)", "#34d399"), width: "100%", marginBottom: "12px" }}>📥 Import Save</button>
 
-      <div style={{ marginBottom: "16px" }}>
-        <textarea
-          value={importText}
-          onChange={(e) => setImportText(e.target.value)}
-          placeholder="Paste save code di sini..."
-          style={{ width: "100%", height: "60px", background: "#141420", color: "white", border: "1px solid var(--color-border)", borderRadius: "6px", padding: "8px", fontSize: "12px", resize: "vertical", boxSizing: "border-box" }}
-        />
-        <button
-          onClick={handleImport}
-          style={{ marginTop: "6px", padding: "8px 16px", background: "var(--color-success)", color: "white", border: "none", borderRadius: "6px", cursor: "pointer" }}
-        >
-          📥 Import Save
-        </button>
-      </div>
+      {message && <p style={{ fontSize: "11px", color: "var(--color-accent-gold)", textAlign: "center" }}>{message}</p>}
 
-      {message && (
-        <p style={{ fontSize: "13px", color: "var(--color-accent-gold)" }}>{message}</p>
-      )}
-
-      <button
-        onClick={handleReset}
-        style={{ padding: "8px 16px", background: "var(--color-danger)", color: "white", border: "none", borderRadius: "6px", cursor: "pointer" }}
-      >
-        🗑️ Reset All Progress
-      </button>
+      <button onClick={handleReset} style={{ ...pillBtn("rgba(244,63,94,0.2)", "#fb7185"), width: "100%" }}>🗑️ Reset All Progress</button>
     </div>
   );
 }
