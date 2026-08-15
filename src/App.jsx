@@ -19,7 +19,6 @@ import { useBossFight } from "./game/useBossFight";
 import { useAchievementChecker } from "./game/useQuestsAndAchievements";
 import { useOfflineProgressPopup } from "./game/useOfflineProgress";
 import { getXpToNextLevel } from "./game/formulas";
-import { getTotalDamageBonus } from "./game/useSkillTree";
 import { getTotalDamageBonus, getTotalGoldBonus } from "./game/useSkillTree";
 import { getGlobalBonusPercent } from "./game/useAscension";
 import { formatNumber } from "./game/numberFormat";
