@@ -4,19 +4,11 @@ import { canFuse, fuseItems, getNextRarity } from "../game/useFusion";
 
 function InventoryPanel({ gameState, setGameState }) {
   function handleEquip(item) {
-    setGameState((prev) => ({
-      ...prev,
-      equippedItems: { ...prev.equippedItems, [item.slot]: item },
-    }));
+    setGameState((prev) => ({ ...prev, equippedItems: { ...prev.equippedItems, [item.slot]: item } }));
   }
-
   function handleUnequip(slot) {
-    setGameState((prev) => ({
-      ...prev,
-      equippedItems: { ...prev.equippedItems, [slot]: null },
-    }));
+    setGameState((prev) => ({ ...prev, equippedItems: { ...prev.equippedItems, [slot]: null } }));
   }
-
   function handleSell(item) {
     setGameState((prev) => {
       const isEquipped = prev.equippedItems[item.slot]?.instanceId === item.instanceId;
@@ -24,45 +16,48 @@ function InventoryPanel({ gameState, setGameState }) {
         ...prev,
         gold: prev.gold + item.sellPrice,
         inventory: prev.inventory.filter((i) => i.instanceId !== item.instanceId),
-        equippedItems: isEquipped
-          ? { ...prev.equippedItems, [item.slot]: null }
-          : prev.equippedItems,
+        equippedItems: isEquipped ? { ...prev.equippedItems, [item.slot]: null } : prev.equippedItems,
       };
     });
   }
-
   function handleFuse(rarity) {
     fuseItems(rarity, gameState, setGameState);
   }
 
   return (
-    <div className="panel-card">
-      <h3 style={{ marginTop: 0 }}>🎒 Inventory</h3>
+    <div className="glass-panel" style={{ padding: "18px", maxWidth: "420px" }}>
+      <h3 style={{ margin: "0 0 14px 0", fontSize: "16px" }}>🎒 Inventory</h3>
 
-      {/* Equipped Items - 7 slot */}
-      <div style={{ marginBottom: "12px", padding: "10px", background: "#1a1a2a", borderRadius: "8px", border: "1px solid var(--color-border)" }}>
-        <strong style={{ fontSize: "13px" }}>Equipped:</strong>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px", marginTop: "6px" }}>
-          {slotList.map((slot) => {
-            const item = gameState.equippedItems[slot];
-            const slotInfo = slotConfig[slot];
-            return (
-              <div key={slot} style={{ fontSize: "12px", padding: "4px 6px", background: "#141420", borderRadius: "6px" }}>
-                <span>{slotInfo.emoji} </span>
-                {item ? (
-                  <span style={{ color: rarityConfig[item.rarity].color }}>{item.name}</span>
-                ) : (
-                  <span style={{ color: "var(--color-text-muted)" }}>Empty</span>
-                )}
+      {/* 7 slot bulat */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "10px", marginBottom: "16px" }}>
+        {slotList.map((slot) => {
+          const item = gameState.equippedItems[slot];
+          const slotInfo = slotConfig[slot];
+          const rarityColor = item ? rarityConfig[item.rarity].color : "rgba(255,255,255,0.15)";
+          return (
+            <div key={slot} style={{ textAlign: "center" }}>
+              <div
+                onClick={() => item && handleUnequip(slot)}
+                style={{
+                  width: "56px", height: "56px", borderRadius: "18px", margin: "0 auto",
+                  background: item ? `${rarityColor}22` : "rgba(255,255,255,0.03)",
+                  border: `2px solid ${item ? rarityColor : "var(--color-border)"}`,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: "22px", cursor: item ? "pointer" : "default",
+                  boxShadow: item ? `0 0 12px ${rarityColor}55` : "none",
+                }}
+              >
+                {slotInfo.emoji}
               </div>
-            );
-          })}
-        </div>
+              <div style={{ fontSize: "9px", color: "var(--color-text-muted)", marginTop: "3px" }}>{slotInfo.label}</div>
+            </div>
+          );
+        })}
       </div>
 
-      {/* Fusion Panel */}
-      <div style={{ marginBottom: "12px", padding: "10px", background: "#1a1a2a", borderRadius: "8px", border: "1px solid var(--color-border)" }}>
-        <strong style={{ fontSize: "13px" }}>⚗️ Fusion (per rarity, semua slot digabung)</strong>
+      {/* Fusion */}
+      <div className="glass-panel" style={{ padding: "12px", marginTop: 0, marginBottom: "14px", maxWidth: "none" }}>
+        <div style={{ fontSize: "11px", fontWeight: 700, marginBottom: "8px", color: "var(--color-text-muted)" }}>⚗️ FUSION</div>
         {rarityOrder.slice(0, -1).map((rarity) => {
           const config = rarityConfig[rarity];
           const nextRarity = getNextRarity(rarity);
@@ -73,15 +68,19 @@ function InventoryPanel({ gameState, setGameState }) {
 
           return (
             <div key={rarity} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "6px" }}>
-              <span style={{ fontSize: "12px" }}>
-                <span style={{ color: config.color }}>{owned}/{required} {config.label}</span>
+              <span style={{ fontSize: "11px" }}>
+                <span style={{ color: config.color }}>{owned}/{required}</span>
                 {" → "}
-                <span style={{ color: nextConfig.color }}>1 {nextConfig.label}</span>
+                <span style={{ color: nextConfig.color }}>{nextConfig.label}</span>
               </span>
               <button
                 onClick={() => handleFuse(rarity)}
                 disabled={!ready}
-                style={{ padding: "4px 10px", background: ready ? "var(--color-accent-purple)" : "#444", color: "white", border: "none", borderRadius: "5px", cursor: ready ? "pointer" : "not-allowed", fontSize: "11px" }}
+                style={{
+                  padding: "4px 12px", borderRadius: "var(--radius-pill)",
+                  background: ready ? "linear-gradient(135deg, #a855f7, #7c3aed)" : "rgba(255,255,255,0.05)",
+                  color: "white", border: "none", cursor: ready ? "pointer" : "not-allowed", fontSize: "10px",
+                }}
               >
                 Fuse
               </button>
@@ -91,56 +90,37 @@ function InventoryPanel({ gameState, setGameState }) {
       </div>
 
       {gameState.inventory.length === 0 && (
-        <p style={{ color: "var(--color-text-muted)", fontSize: "13px" }}>No items yet. Defeat enemies for a chance to find loot.</p>
+        <p style={{ color: "var(--color-text-muted)", fontSize: "12px", textAlign: "center" }}>No items yet. Defeat enemies for loot.</p>
       )}
 
-      {gameState.inventory.map((item) => {
-        const config = rarityConfig[item.rarity];
-        const slotInfo = slotConfig[item.slot];
-        const isEquipped = gameState.equippedItems[item.slot]?.instanceId === item.instanceId;
-        const statLabel = item.statType === "damageBonus" ? "Dmg" : "HP";
+      <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+        {gameState.inventory.map((item) => {
+          const config = rarityConfig[item.rarity];
+          const slotInfo = slotConfig[item.slot];
+          const isEquipped = gameState.equippedItems[item.slot]?.instanceId === item.instanceId;
+          const statLabel = item.statType === "damageBonus" ? "Dmg" : "HP";
 
-        return (
-          <div
-            key={item.instanceId}
-            style={{
-              display: "flex", justifyContent: "space-between", alignItems: "center",
-              padding: "8px", marginBottom: "6px", background: "#141420",
-              borderRadius: "8px", borderLeft: `4px solid ${config.color}`,
-            }}
-          >
-            <div>
-              <strong style={{ color: config.color }}>{slotInfo.emoji} {item.name}</strong>
-              <p style={{ margin: 0, fontSize: "12px", color: "var(--color-text-muted)" }}>
-                {config.label} {slotInfo.label} · +{item.statValue} {statLabel}
-              </p>
+          return (
+            <div key={item.instanceId} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 10px", borderRadius: "14px", background: "rgba(255,255,255,0.03)", border: `1px solid ${config.color}33` }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <div style={{ width: "34px", height: "34px", borderRadius: "10px", background: `${config.color}22`, border: `1px solid ${config.color}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "15px", boxShadow: `0 0 8px ${config.color}44` }}>
+                  {slotInfo.emoji}
+                </div>
+                <div>
+                  <div style={{ fontSize: "11px", fontWeight: 700, color: config.color }}>{item.name}</div>
+                  <div style={{ fontSize: "10px", color: "var(--color-text-muted)" }}>+{item.statValue} {statLabel}</div>
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: "4px" }}>
+                {!isEquipped && (
+                  <button onClick={() => handleEquip(item)} style={{ padding: "4px 10px", borderRadius: "var(--radius-pill)", background: "rgba(52,211,153,0.2)", color: "#34d399", border: "1px solid rgba(52,211,153,0.4)", cursor: "pointer", fontSize: "10px" }}>Equip</button>
+                )}
+                <button onClick={() => handleSell(item)} style={{ padding: "4px 10px", borderRadius: "var(--radius-pill)", background: "rgba(244,63,94,0.2)", color: "#fb7185", border: "1px solid rgba(244,63,94,0.4)", cursor: "pointer", fontSize: "10px" }}>Sell</button>
+              </div>
             </div>
-            <div style={{ display: "flex", gap: "6px" }}>
-              {isEquipped ? (
-                <button
-                  onClick={() => handleUnequip(item.slot)}
-                  style={{ padding: "4px 10px", background: "#444", color: "white", border: "none", borderRadius: "5px", cursor: "pointer", fontSize: "12px" }}
-                >
-                  Unequip
-                </button>
-              ) : (
-                <button
-                  onClick={() => handleEquip(item)}
-                  style={{ padding: "4px 10px", background: "var(--color-success)", color: "white", border: "none", borderRadius: "5px", cursor: "pointer", fontSize: "12px" }}
-                >
-                  Equip
-                </button>
-              )}
-              <button
-                onClick={() => handleSell(item)}
-                style={{ padding: "4px 10px", background: "var(--color-danger)", color: "white", border: "none", borderRadius: "5px", cursor: "pointer", fontSize: "12px" }}
-              >
-                Sell ({item.sellPrice}g)
-              </button>
-            </div>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
     </div>
   );
 }
