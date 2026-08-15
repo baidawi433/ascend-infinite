@@ -81,3 +81,72 @@ h1 {
     transform: translateX(0);
   }
 }
+
+/* ===== BATTLE ARENA ANIMATIONS ===== */
+
+/* Karakter/musuh bergoyang pelan saat idle (tidak sedang diserang) */
+@keyframes idleBob {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+
+/* Karakter melompat maju saat menyerang */
+@keyframes attackLunge {
+  0% { transform: translateX(0); }
+  30% { transform: translateX(24px) scale(1.05); }
+  100% { transform: translateX(0); }
+}
+
+/* Musuh bergetar + flash merah saat kena hit */
+@keyframes hitShake {
+  0% { transform: translateX(0); filter: brightness(1); }
+  20% { transform: translateX(-8px); filter: brightness(2) saturate(3) hue-rotate(-20deg); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-5px); }
+  80% { transform: translateX(5px); }
+  100% { transform: translateX(0); filter: brightness(1); }
+}
+
+/* Musuh hancur/mati - fade out + scale down + sedikit rotate */
+@keyframes enemyDeath {
+  0% { opacity: 1; transform: scale(1) rotate(0deg); }
+  100% { opacity: 0; transform: scale(0.3) rotate(25deg) translateY(20px); }
+}
+
+/* Musuh baru muncul dari kecil ke normal */
+@keyframes enemySpawn {
+  0% { opacity: 0; transform: scale(0.4); }
+  60% { opacity: 1; transform: scale(1.1); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Getaran layar untuk critical hit */
+@keyframes screenShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+.sprite-idle {
+  animation: idleBob 2s ease-in-out infinite;
+}
+
+.sprite-attacking {
+  animation: attackLunge 0.3s ease-out;
+}
+
+.sprite-hit {
+  animation: hitShake 0.35s ease-out;
+}
+
+.sprite-dying {
+  animation: enemyDeath 0.4s ease-in forwards;
+}
+
+.sprite-spawning {
+  animation: enemySpawn 0.4s ease-out;
+}
+
+.screen-shake {
+  animation: screenShake 0.25s ease-in-out;
+}
