@@ -1,5 +1,6 @@
 import ToastNotification from "./components/ToastNotification";
 import LevelUpOverlay from "./components/LevelUpOverlay";
+import CharacterCard from "./components/CharacterCard";
 import { useState, useEffect, useRef } from "react";
 import CombatScreen from "./components/CombatScreen";
 import BossScreen from "./components/BossScreen";
@@ -150,6 +151,8 @@ function App() {
           <span>🌟 {formatNumber(gameState.skillPoint)} SP</span>
         </div>
       </div>
+
+      <CharacterCard gameState={gameState} effectiveHp={effectiveHp} />
 
       <div style={{ padding: "0 20px" }}>
         {activeTab === "battle" && (
