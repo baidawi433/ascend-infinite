@@ -1,7 +1,10 @@
 // BossScreen.jsx
 import { formatNumber } from "../game/numberFormat";
+import { useAutoAttack } from "../game/useAutoAttack";
 
-function BossScreen({ boss, attackBoss }) {
+function BossScreen({ boss, attackBoss, autoAttackEnabled }) {
+  useAutoAttack(autoAttackEnabled && !!boss, attackBoss);
+
   if (!boss) return null;
 
   const hpPercent = Math.max(0, (boss.currentHp / boss.hp) * 100);
