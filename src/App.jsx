@@ -1,5 +1,6 @@
 import ToastNotification from "./components/ToastNotification";
-import { useState, useEffect } from "react";
+import LevelUpOverlay from "./components/LevelUpOverlay";
+import { useState, useEffect, useRef } from "react";
 import CombatScreen from "./components/CombatScreen";
 import BossScreen from "./components/BossScreen";
 import UpgradePanel from "./components/UpgradePanel";
@@ -53,11 +54,16 @@ function App() {
     setSfxEnabled(gameState.sfxEnabled);
   }, [gameState.sfxEnabled]);
 
-  // Mainkan suara level up setiap kali level bertambah
-  const prevLevelRef = useState(gameState.level)[0];
+  const [showLevelUp, setShowLevelUp] = useState(false);
+  const prevLevelRef = useRef(gameState.level);
+
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (gameState.level > prevLevelRef.current) {
+      playLevelUpSound();
+      setShowLevelUp(true);
+    }
+    prevLevelRef.current = gameState.level;
+  }, [gameState.level]);
   useAchievementChecker(gameState, setGameState);
 
   const { offlineReport, claimOfflineProgress } = useOfflineProgressPopup(
@@ -212,6 +218,7 @@ function App() {
 
       <OfflineProgressPopup offlineReport={offlineReport} onClaim={claimOfflineProgress} />
       <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
+      <LevelUpOverlay show={showLevelUp} level={gameState.level} onDone={() => setShowLevelUp(false)} />
       <ToastNotification toasts={toasts} onRemove={removeToast} />
     </div>
   );

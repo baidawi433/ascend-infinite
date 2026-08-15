@@ -150,3 +150,25 @@ h1 {
 .screen-shake {
   animation: screenShake 0.25s ease-in-out;
 }
+
+/* Boss enrage - pulsing red glow */
+@keyframes enrageGlow {
+  0%, 100% { text-shadow: 0 0 8px rgba(231,76,60,0.6); }
+  50% { text-shadow: 0 0 20px rgba(231,76,60,1), 0 0 30px rgba(231,76,60,0.6); }
+}
+
+.boss-enrage-text {
+  animation: enrageGlow 0.8s ease-in-out infinite;
+}
+
+@keyframes bossScreenShake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px) rotate(-0.5deg); }
+  40% { transform: translateX(6px) rotate(0.5deg); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
+.boss-screen-shake {
+  animation: bossScreenShake 0.3s ease-in-out;
+}
