@@ -188,7 +188,7 @@ function App() {
               </button>
             )}
 
-            {isBossActive && <BossScreen boss={boss} attackBoss={attackBoss} autoAttackEnabled={gameState.autoAttackEnabled} />}
+            {isBossActive && <BossScreen boss={boss} attackBoss={attackBoss} autoAttackEnabled={gameState.autoAttackEnabled} areaId={currentAreaId} />}
 
             <UpgradePanel gameState={gameState} setGameState={setGameState} />
           </>

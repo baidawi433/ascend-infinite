@@ -16,25 +16,41 @@ function UpgradePanel({ gameState, setGameState }) {
   }
 
   return (
-    <div className="panel-card">
-      <h3 style={{ marginTop: 0 }}>⬆️ Upgrade Damage</h3>
-      <p style={{ color: "var(--color-text-muted)", fontSize: "13px" }}>Current Damage: {formatNumber(gameState.damage)}</p>
-      <p style={{ color: "var(--color-accent-gold)", fontSize: "14px" }}>Cost: {formatNumber(cost)} Gold</p>
+    <div
+      className="glass-panel"
+      style={{
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        padding: "14px 16px", marginTop: "14px", maxWidth: "420px",
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+        <div style={{
+          width: "44px", height: "44px", borderRadius: "50%",
+          background: "linear-gradient(135deg, #22d3ee, #0ea5e9)",
+          display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px",
+          flexShrink: 0,
+        }}>
+          ⚔️
+        </div>
+        <div>
+          <div style={{ fontSize: "13px", fontWeight: 700 }}>Damage: {formatNumber(gameState.damage)}</div>
+          <div style={{ fontSize: "11px", color: "var(--color-accent-gold)" }}>{formatNumber(cost)} 🪙</div>
+        </div>
+      </div>
+
       <button
         onClick={handleUpgrade}
         disabled={!canAfford}
         style={{
-          padding: "10px 20px",
-          background: canAfford ? "var(--color-success)" : "#444",
-          color: "white",
-          border: "none",
-          borderRadius: "8px",
+          width: "40px", height: "40px", borderRadius: "50%", border: "none",
+          background: canAfford ? "linear-gradient(135deg, #34d399, #059669)" : "rgba(255,255,255,0.08)",
+          color: "white", fontSize: "20px", fontWeight: "bold",
           cursor: canAfford ? "pointer" : "not-allowed",
-          fontSize: "15px",
-          fontWeight: "bold",
+          boxShadow: canAfford ? "0 4px 14px rgba(52,211,153,0.4)" : "none",
+          flexShrink: 0,
         }}
       >
-        Upgrade (+1 Damage)
+        +
       </button>
     </div>
   );
