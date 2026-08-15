@@ -1,4 +1,4 @@
-// App.jsx
+import ToastNotification from "./components/ToastNotification";
 import { useState, useEffect } from "react";
 import CombatScreen from "./components/CombatScreen";
 import BossScreen from "./components/BossScreen";
@@ -34,6 +34,16 @@ function App() {
   const [currentAreaId, setCurrentAreaId] = useState("whispering_forest");
   const [isBossActive, setIsBossActive] = useState(false);
   const [activeTab, setActiveTab] = useState("battle");
+  const [toasts, setToasts] = useState([]);
+
+  function addToast(type, title, subtitle) {
+    const id = `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+    setToasts((prev) => [...prev, { id, type, title, subtitle }]);
+  }
+
+  function removeToast(id) {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  }
 
   useAutoSave(gameState);
   useLevelUp(gameState, setGameState);
@@ -69,6 +79,7 @@ function App() {
 
     if (droppedItem) {
       playLootSound();
+      addToast("loot", `${droppedItem.rarity.toUpperCase()} ITEM!`, droppedItem.name);
     }
 
     setGameState((prev) => ({
@@ -85,6 +96,7 @@ function App() {
   function handleBossDefeated(gold, xp, skillPoints) {
     const goldWithBonus = Math.floor(gold * (1 + globalBonusPercent / 100));
     playBossDefeatSound();
+    addToast("boss", "BOSS DEFEATED!", `+${skillPoints} Skill Points`);
     setGameState((prev) => ({
       ...prev,
       gold: prev.gold + goldWithBonus,
@@ -200,6 +212,7 @@ function App() {
 
       <OfflineProgressPopup offlineReport={offlineReport} onClaim={claimOfflineProgress} />
       <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
+      <ToastNotification toasts={toasts} onRemove={removeToast} />
     </div>
   );
 }
