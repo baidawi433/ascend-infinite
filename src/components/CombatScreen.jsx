@@ -78,6 +78,7 @@ function CombatScreen({ damage, areaId, onReward, autoAttackEnabled, critChance,
         isCritical={isCritical}
         isDying={isDying}
         triggerAttackId={attackTrigger}
+        areaId={areaId}
       />
 
       <div style={{ background: "#0a0a12", borderRadius: "6px", overflow: "hidden", height: "22px", marginBottom: "10px", border: "1px solid #2a2a3a" }}>

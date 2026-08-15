@@ -172,3 +172,13 @@ h1 {
 .boss-screen-shake {
   animation: bossScreenShake 0.3s ease-in-out;
 }
+
+/* Fade saat pindah tab */
+@keyframes tabFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.tab-content {
+  animation: tabFadeIn 0.25s ease-out;
+}

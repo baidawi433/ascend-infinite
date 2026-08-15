@@ -154,7 +154,7 @@ function App() {
 
       <CharacterCard gameState={gameState} effectiveHp={effectiveHp} />
 
-      <div style={{ padding: "0 20px" }}>
+      <div className="tab-content" key={activeTab} style={{ padding: "0 20px" }}>
         {activeTab === "battle" && (
           <>
             <button
