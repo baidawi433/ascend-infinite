@@ -17,6 +17,9 @@ import EndlessTowerPanel from "./components/EndlessTowerPanel";
 import NpcPanel from "./components/NpcPanel";
 import AnimatedNumber from "./components/AnimatedNumber";
 import AscendedOverlay from "./components/AscendedOverlay";
+import NewGamePlusPanel from "./components/NewGamePlusPanel";
+import ParticleBurst from "./components/ParticleBurst";
+import { getNewGamePlusBonusPercent } from "./game/useNewGamePlus";
 import { FINAL_BOSS_ID } from "./game/GameState";
 import { loadGame, useAutoSave } from "./game/useSaveGame";
 import { useLevelUp } from "./game/useLevelUp";
@@ -61,12 +64,20 @@ function App() {
 
   const [showLevelUp, setShowLevelUp] = useState(false);
   const [showAscendedOverlay, setShowAscendedOverlay] = useState(false);
+  const [particleBurstTrigger, setParticleBurstTrigger] = useState(0);
+  const [particleColorTheme, setParticleColorTheme] = useState("gold");
+
+  function fireParticleBurst(theme) {
+    setParticleColorTheme(theme);
+    setParticleBurstTrigger((prev) => prev + 1);
+  }
   const prevLevelRef = useRef(gameState.level);
 
   useEffect(() => {
     if (gameState.level > prevLevelRef.current) {
       playLevelUpSound();
       setShowLevelUp(true);
+      fireParticleBurst("purple");
     }
     prevLevelRef.current = gameState.level;
   }, [gameState.level]);
@@ -84,14 +95,19 @@ function App() {
   }, [setGameState]);
 
   const globalBonusPercent = getGlobalBonusPercent(gameState.ascensionCount);
+  const newGamePlusBonusPercent = getNewGamePlusBonusPercent(gameState.newGamePlusCount);
+  const totalGlobalBonusPercent = globalBonusPercent + newGamePlusBonusPercent;
 
   function handleReward(gold, xp, droppedItem) {
     const skillGoldBonus = getTotalGoldBonus(gameState.unlockedSkills);
-    const goldWithBonus = Math.floor(gold * (1 + (globalBonusPercent + skillGoldBonus) / 100));
+    const goldWithBonus = Math.floor(gold * (1 + (totalGlobalBonusPercent + skillGoldBonus) / 100));
 
     if (droppedItem) {
       playLootSound();
       addToast("loot", `${droppedItem.rarity.toUpperCase()} ITEM!`, droppedItem.name);
+      if (droppedItem.rarity === "legendary" || droppedItem.rarity === "mythic") {
+        fireParticleBurst("rainbow");
+      }
     }
 
     setGameState((prev) => ({
@@ -106,9 +122,10 @@ function App() {
   }
 
   function handleBossDefeated(bossId, gold, xp, skillPoints) {
-    const goldWithBonus = Math.floor(gold * (1 + globalBonusPercent / 100));
+    const goldWithBonus = Math.floor(gold * (1 + totalGlobalBonusPercent / 100));
     playBossDefeatSound();
     addToast("boss", "BOSS DEFEATED!", `+${skillPoints} Skill Points`);
+    fireParticleBurst("gold");
 
     const isFirstTimeFinalBoss = bossId === FINAL_BOSS_ID && !gameState.infinityModeUnlocked;
 
@@ -136,7 +153,7 @@ function App() {
 
   const xpNeeded = getXpToNextLevel(gameState.level);
   const skillDamageBonusPercent = getTotalDamageBonus(gameState.unlockedSkills);
-  const totalDamageBonusPercent = skillDamageBonusPercent + globalBonusPercent;
+  const totalDamageBonusPercent = skillDamageBonusPercent + totalGlobalBonusPercent;
   const equipmentDamageBonus = Object.values(gameState.equippedItems)
     .filter((item) => item && item.statType === "damageBonus")
     .reduce((total, item) => total + item.statValue, 0);
@@ -231,6 +248,7 @@ function App() {
         {activeTab === "progress" && (
           <>
             <AscensionPanel gameState={gameState} setGameState={setGameState} />
+            <NewGamePlusPanel gameState={gameState} setGameState={setGameState} />
             <EndlessTowerPanel damage={effectiveDamage} gameState={gameState} setGameState={setGameState} />
             <QuestPanel gameState={gameState} setGameState={setGameState} />
             <SettingsPanel gameState={gameState} setGameState={setGameState} />
@@ -242,6 +260,7 @@ function App() {
       <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
       <LevelUpOverlay show={showLevelUp} level={gameState.level} onDone={() => setShowLevelUp(false)} />
       <AscendedOverlay show={showAscendedOverlay} onClose={() => setShowAscendedOverlay(false)} />
+      <ParticleBurst trigger={particleBurstTrigger} colorTheme={particleColorTheme} />
       <ToastNotification toasts={toasts} onRemove={removeToast} />
     </div>
   );

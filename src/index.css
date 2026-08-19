@@ -275,3 +275,16 @@ h1 {
 .floating-nav-item span.icon {
   font-size: 19px;
 }
+
+
+/* Partikel terbang keluar lalu fade dan mengecil */
+@keyframes particleFly {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--tx), var(--ty)) scale(0.3);
+    opacity: 0;
+  }
+}
