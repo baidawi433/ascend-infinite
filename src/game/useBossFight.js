@@ -1,19 +1,19 @@
 // useBossFight.js
-// Mengatur logika combat melawan boss
+// Mengatur logika combat melawan boss, mendukung multi-boss per area
 
 import { useState, useEffect } from "react";
 import { getBossForArea } from "./bosses";
 
-export function useBossFight(damage, areaId, isBossActive, onBossDefeated) {
+export function useBossFight(damage, areaId, isBossActive, defeatedBossIds, onBossDefeated) {
   const [boss, setBoss] = useState(null);
 
-  // Setiap kali fight boss diaktifkan/area berubah, siapkan boss baru
   useEffect(() => {
     if (isBossActive) {
-      setBoss(getBossForArea(areaId));
+      setBoss(getBossForArea(areaId, defeatedBossIds));
     } else {
       setBoss(null);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isBossActive, areaId]);
 
   function attackBoss() {
@@ -24,8 +24,8 @@ export function useBossFight(damage, areaId, isBossActive, onBossDefeated) {
       const newHp = prev.currentHp - damage;
 
       if (newHp <= 0) {
-        onBossDefeated(prev.goldReward, prev.xpReward, prev.skillPointReward);
-        return null; // Boss dikalahkan, kembali ke combat biasa
+        onBossDefeated(prev.id, prev.goldReward, prev.xpReward, prev.skillPointReward);
+        return null;
       }
 
       return { ...prev, currentHp: newHp };

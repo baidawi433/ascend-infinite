@@ -5,9 +5,16 @@ import { playAttackSound } from "../game/audio";
 import BattleArena from "./BattleArena";
 
 const bossEmojiMap = {
-  forest_guardian: "🌳", sand_wyrm: "🐍", frost_queen: "❄️", flame_titan: "🔥",
-  shadow_knight: "🗡️", necromancer_king: "💀", demon_general: "👹",
-  void_guardian: "🌌", fallen_angel: "🪽", the_ascended: "♾️",
+  forest_guardian: "🌳", goblin_king: "👑",
+  sand_wyrm: "🐍", desert_tyrant: "🦂",
+  frost_queen: "❄️", ice_colossus: "🧊",
+  flame_titan: "🔥", magma_lord: "🌋",
+  shadow_knight: "🗡️", abyss_beast: "🐺",
+  necromancer_king: "💀", celestial_serpent: "🐉",
+  demon_general: "👹", ancient_dragon: "🐲",
+  void_guardian: "🌌", time_keeper: "⏳",
+  fallen_angel: "🪽", world_eater: "🌍",
+  infinity_guardian: "🔱", the_ascended: "♾️",
 };
 
 function BossScreen({ boss, attackBoss, autoAttackEnabled, areaId }) {

@@ -19,6 +19,7 @@ import AnimatedNumber from "./components/AnimatedNumber";
 import { loadGame, useAutoSave } from "./game/useSaveGame";
 import { useLevelUp } from "./game/useLevelUp";
 import { useBossFight } from "./game/useBossFight";
+import { hasAvailableBoss } from "./game/bosses";
 import { useAchievementChecker } from "./game/useQuestsAndAchievements";
 import { useOfflineProgressPopup } from "./game/useOfflineProgress";
 import { getXpToNextLevel } from "./game/formulas";
@@ -101,7 +102,7 @@ function App() {
     }));
   }
 
-  function handleBossDefeated(gold, xp, skillPoints) {
+  function handleBossDefeated(bossId, gold, xp, skillPoints) {
     const goldWithBonus = Math.floor(gold * (1 + globalBonusPercent / 100));
     playBossDefeatSound();
     addToast("boss", "BOSS DEFEATED!", `+${skillPoints} Skill Points`);
@@ -113,7 +114,7 @@ function App() {
       killCount: 0,
       totalKills: prev.totalKills + 1,
       totalGoldEarned: prev.totalGoldEarned + goldWithBonus,
-      bossesDefeated: [...prev.bossesDefeated, currentAreaId],
+      bossesDefeated: [...prev.bossesDefeated, bossId],
     }));
     setIsBossActive(false);
   }
@@ -138,8 +139,9 @@ function App() {
   );
   const effectiveHp = gameState.hp + equipmentHpBonus;
 
-  const { boss, attackBoss } = useBossFight(effectiveDamage, currentAreaId, isBossActive, handleBossDefeated);
-  const canChallengeBoss = gameState.killCount >= KILLS_TO_UNLOCK_BOSS && !isBossActive;
+  const { boss, attackBoss } = useBossFight(effectiveDamage, currentAreaId, isBossActive, gameState.bossesDefeated, handleBossDefeated);
+  const bossAvailable = hasAvailableBoss(currentAreaId, gameState.bossesDefeated);
+  const canChallengeBoss = gameState.killCount >= KILLS_TO_UNLOCK_BOSS && !isBossActive && bossAvailable;
 
   return (
     <div style={{ color: "white", background: "#0a0a1a", minHeight: "100vh", paddingBottom: "70px", fontFamily: "sans-serif" }}>
@@ -187,6 +189,11 @@ function App() {
               >
                 🔥 Challenge Boss!
               </button>
+            )}
+            {gameState.killCount >= KILLS_TO_UNLOCK_BOSS && !isBossActive && !bossAvailable && (
+              <p style={{ marginTop: "12px", fontSize: "12px", color: "var(--color-accent-gold)", textAlign: "center" }}>
+                ✅ All bosses in this area defeated! Explore a new area.
+              </p>
             )}
 
             {isBossActive && <BossScreen boss={boss} attackBoss={attackBoss} autoAttackEnabled={gameState.autoAttackEnabled} areaId={currentAreaId} />}
