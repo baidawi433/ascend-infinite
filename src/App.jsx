@@ -15,6 +15,7 @@ import OfflineProgressPopup from "./components/OfflineProgressPopup";
 import BottomNav from "./components/BottomNav";
 import EndlessTowerPanel from "./components/EndlessTowerPanel";
 import NpcPanel from "./components/NpcPanel";
+import AnimatedNumber from "./components/AnimatedNumber";
 import { loadGame, useAutoSave } from "./game/useSaveGame";
 import { useLevelUp } from "./game/useLevelUp";
 import { useBossFight } from "./game/useBossFight";
@@ -146,8 +147,8 @@ function App() {
         <h1 className="game-title">⚔️ ASCEND: INFINITE</h1>
         <div className="stat-bar" style={{ marginBottom: "10px" }}>
           <span className="hud-pill" style={{ color: "var(--color-accent-purple)" }}>⭐ Lv.{formatNumber(gameState.level)}</span>
-          <span className="hud-pill" style={{ color: "var(--color-accent-gold)" }}>🪙 {formatNumber(gameState.gold)}</span>
-          <span className="hud-pill" style={{ color: "var(--color-accent-cyan)" }}>✨ {formatNumber(gameState.xp)}/{formatNumber(xpNeeded)}</span>
+          <span className="hud-pill" style={{ color: "var(--color-accent-gold)" }}>🪙 <AnimatedNumber value={gameState.gold} /></span>
+          <span className="hud-pill" style={{ color: "var(--color-accent-cyan)" }}>✨ <AnimatedNumber value={gameState.xp} />/{formatNumber(xpNeeded)}</span>
           <span className="hud-pill" style={{ color: "var(--color-success)" }}>🌟 {formatNumber(gameState.skillPoint)}</span>
         </div>
       </div>
