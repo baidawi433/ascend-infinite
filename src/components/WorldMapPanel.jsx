@@ -2,9 +2,24 @@
 import { areaList } from "../game/areas";
 
 function WorldMapPanel({ gameState, currentAreaId, setCurrentAreaId }) {
+  const activeArea = areaList.find((a) => a.id === currentAreaId);
+
   return (
     <div className="glass-panel" style={{ padding: "18px", maxWidth: "420px" }}>
       <h3 style={{ margin: "0 0 14px 0", fontSize: "16px" }}>🗺️ World Map</h3>
+
+      {activeArea && (
+        <div style={{
+          padding: "12px 14px", borderRadius: "16px", marginBottom: "14px",
+          background: "linear-gradient(90deg, rgba(168,85,247,0.12), rgba(34,211,238,0.06))",
+          border: "1px solid rgba(168,85,247,0.3)",
+        }}>
+          <div style={{ fontSize: "12px", fontWeight: 700, marginBottom: "4px" }}>{activeArea.emoji} {activeArea.name}</div>
+          <div style={{ fontSize: "11px", color: "var(--color-text-muted)", fontStyle: "italic", lineHeight: "1.5" }}>
+            "{activeArea.lore}"
+          </div>
+        </div>
+      )}
 
       <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
         {areaList.map((area) => {
