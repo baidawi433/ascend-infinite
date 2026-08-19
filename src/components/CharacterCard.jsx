@@ -1,12 +1,9 @@
 // CharacterCard.jsx
-// Kartu karakter persisten yang selalu tampil di semua tab
-
-import { formatNumber } from "../game/numberFormat";
+import AnimatedNumber from "./AnimatedNumber";
 
 function CharacterCard({ gameState, effectiveHp }) {
-  const hpPercent = 100; // HP karakter selalu penuh di luar combat (representasi visual saja)
+  const hpPercent = 100;
 
-  // Title sederhana berdasarkan level, biar terasa progression identitas
   function getTitle(level) {
     if (level >= 1000) return "Infinity Walker";
     if (level >= 500) return "Ascended";
@@ -20,26 +17,17 @@ function CharacterCard({ gameState, effectiveHp }) {
   return (
     <div
       style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "12px",
-        padding: "10px 20px",
+        display: "flex", alignItems: "center", gap: "12px", padding: "10px 20px",
         background: "linear-gradient(90deg, rgba(142,68,173,0.12), rgba(52,152,219,0.08))",
         borderBottom: "1px solid var(--color-border)",
       }}
     >
       <div
         style={{
-          fontSize: "32px",
-          width: "50px",
-          height: "50px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          background: "#1a1a2a",
-          borderRadius: "50%",
-          border: "2px solid var(--color-accent-purple)",
-          flexShrink: 0,
+          fontSize: "32px", width: "50px", height: "50px",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          background: "#1a1a2a", borderRadius: "50%",
+          border: "2px solid var(--color-accent-purple)", flexShrink: 0,
         }}
         className="sprite-idle"
       >
@@ -52,7 +40,7 @@ function CharacterCard({ gameState, effectiveHp }) {
           <span style={{ fontSize: "11px", color: "var(--color-accent-gold)" }}>{getTitle(gameState.level)}</span>
         </div>
         <div style={{ fontSize: "11px", color: "var(--color-text-muted)", marginBottom: "3px" }}>
-          Lv.{gameState.level} · {formatNumber(effectiveHp)} HP
+          Lv.{gameState.level} · <AnimatedNumber value={effectiveHp} /> HP
         </div>
         <div style={{ background: "#0a0a12", borderRadius: "4px", overflow: "hidden", height: "6px" }}>
           <div style={{ width: `${hpPercent}%`, background: "linear-gradient(90deg, #27ae60, #2ecc71)", height: "100%" }} />

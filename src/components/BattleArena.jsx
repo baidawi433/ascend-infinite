@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { getAreaThemeColor } from "../game/areas";
-import { formatNumber } from "../game/numberFormat";
+import AnimatedNumber from "./AnimatedNumber";
 
 function BattleArena({ enemyName, enemyEmoji, enemyKey, enemyHp, enemyMaxHp, isCritical, isDying, triggerAttackId, areaId }) {
   const [playerAnim, setPlayerAnim] = useState("sprite-idle");
@@ -48,7 +48,7 @@ function BattleArena({ enemyName, enemyEmoji, enemyKey, enemyHp, enemyMaxHp, isC
       <div style={{ position: "absolute", top: "16px", left: 0, right: 0, textAlign: "center" }}>
         <div style={{ fontSize: "14px", fontWeight: 700 }}>{enemyName}</div>
         <div style={{ fontSize: "11px", color: "var(--color-text-muted)" }}>
-          {formatNumber(enemyHp)} / {formatNumber(enemyMaxHp)} HP
+          <AnimatedNumber value={enemyHp} duration={150} /> / <AnimatedNumber value={enemyMaxHp} duration={150} /> HP
         </div>
       </div>
 

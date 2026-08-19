@@ -1,6 +1,7 @@
 // UpgradePanel.jsx
 import { getUpgradeCost } from "../game/formulas";
 import { formatNumber } from "../game/numberFormat";
+import AnimatedNumber from "./AnimatedNumber";
 
 function UpgradePanel({ gameState, setGameState }) {
   const cost = getUpgradeCost(gameState.damage);
@@ -8,32 +9,24 @@ function UpgradePanel({ gameState, setGameState }) {
 
   function handleUpgrade() {
     if (!canAfford) return;
-    setGameState((prev) => ({
-      ...prev,
-      gold: prev.gold - cost,
-      damage: prev.damage + 1,
-    }));
+    setGameState((prev) => ({ ...prev, gold: prev.gold - cost, damage: prev.damage + 1 }));
   }
 
   return (
     <div
       className="glass-panel"
-      style={{
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-        padding: "14px 16px", marginTop: "14px", maxWidth: "420px",
-      }}
+      style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 16px", marginTop: "14px", maxWidth: "420px" }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
         <div style={{
           width: "44px", height: "44px", borderRadius: "50%",
           background: "linear-gradient(135deg, #22d3ee, #0ea5e9)",
-          display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px",
-          flexShrink: 0,
+          display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", flexShrink: 0,
         }}>
           ⚔️
         </div>
         <div>
-          <div style={{ fontSize: "13px", fontWeight: 700 }}>Damage: {formatNumber(gameState.damage)}</div>
+          <div style={{ fontSize: "13px", fontWeight: 700 }}>Damage: <AnimatedNumber value={gameState.damage} duration={300} /></div>
           <div style={{ fontSize: "11px", color: "var(--color-accent-gold)" }}>{formatNumber(cost)} 🪙</div>
         </div>
       </div>
