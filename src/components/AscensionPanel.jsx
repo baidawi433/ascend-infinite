@@ -36,6 +36,12 @@ function AscensionPanel({ gameState, setGameState }) {
         Current Bonus: +{currentBonus}%
       </div>
 
+      {gameState.infinityModeUnlocked && (
+        <div style={{ marginBottom: "14px", padding: "8px", borderRadius: "12px", background: "rgba(168,85,247,0.12)", border: "1px solid rgba(168,85,247,0.4)" }}>
+          <span style={{ fontSize: "12px", fontWeight: 700 }}>♾️ Infinity Mode Unlocked</span>
+        </div>
+      )}
+
       {ready ? (
         <>
           <p style={{ fontSize: "12px", color: "var(--color-accent-gold)" }}>Ready! Next: +{nextBonus}%</p>

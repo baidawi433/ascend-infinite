@@ -16,13 +16,7 @@ export const initialGameState = {
   ascensionCount: 0,
   inventory: [],
   equippedItems: {
-    weapon: null,
-    helmet: null,
-    armor: null,
-    gloves: null,
-    boots: null,
-    ring: null,
-    amulet: null,
+    weapon: null, helmet: null, armor: null, gloves: null, boots: null, ring: null, amulet: null,
   },
   totalKills: 0,
   totalGoldEarned: 0,
@@ -34,8 +28,11 @@ export const initialGameState = {
   critMultiplier: 2,
   highestTowerFloor: 0,
   sfxEnabled: true,
+  infinityModeUnlocked: false,
+  newGamePlusCount: 0,
 };
 
 export const ASCENSION_LEVEL_REQUIREMENT = 20;
 export const OFFLINE_CAP_HOURS = 8;
 export const ATTACKS_PER_SECOND = 1;
+export const FINAL_BOSS_ID = "the_ascended";

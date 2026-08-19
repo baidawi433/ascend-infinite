@@ -16,6 +16,8 @@ import BottomNav from "./components/BottomNav";
 import EndlessTowerPanel from "./components/EndlessTowerPanel";
 import NpcPanel from "./components/NpcPanel";
 import AnimatedNumber from "./components/AnimatedNumber";
+import AscendedOverlay from "./components/AscendedOverlay";
+import { FINAL_BOSS_ID } from "./game/GameState";
 import { loadGame, useAutoSave } from "./game/useSaveGame";
 import { useLevelUp } from "./game/useLevelUp";
 import { useBossFight } from "./game/useBossFight";
@@ -58,6 +60,7 @@ function App() {
   }, [gameState.sfxEnabled]);
 
   const [showLevelUp, setShowLevelUp] = useState(false);
+  const [showAscendedOverlay, setShowAscendedOverlay] = useState(false);
   const prevLevelRef = useRef(gameState.level);
 
   useEffect(() => {
@@ -106,6 +109,9 @@ function App() {
     const goldWithBonus = Math.floor(gold * (1 + globalBonusPercent / 100));
     playBossDefeatSound();
     addToast("boss", "BOSS DEFEATED!", `+${skillPoints} Skill Points`);
+
+    const isFirstTimeFinalBoss = bossId === FINAL_BOSS_ID && !gameState.infinityModeUnlocked;
+
     setGameState((prev) => ({
       ...prev,
       gold: prev.gold + goldWithBonus,
@@ -115,8 +121,13 @@ function App() {
       totalKills: prev.totalKills + 1,
       totalGoldEarned: prev.totalGoldEarned + goldWithBonus,
       bossesDefeated: [...prev.bossesDefeated, bossId],
+      infinityModeUnlocked: prev.infinityModeUnlocked || bossId === FINAL_BOSS_ID,
     }));
     setIsBossActive(false);
+
+    if (isFirstTimeFinalBoss) {
+      setShowAscendedOverlay(true);
+    }
   }
 
   function toggleAutoAttack() {
@@ -230,6 +241,7 @@ function App() {
       <OfflineProgressPopup offlineReport={offlineReport} onClaim={claimOfflineProgress} />
       <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
       <LevelUpOverlay show={showLevelUp} level={gameState.level} onDone={() => setShowLevelUp(false)} />
+      <AscendedOverlay show={showAscendedOverlay} onClose={() => setShowAscendedOverlay(false)} />
       <ToastNotification toasts={toasts} onRemove={removeToast} />
     </div>
   );
