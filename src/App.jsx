@@ -2,6 +2,7 @@ import ToastNotification from "./components/ToastNotification";
 import LevelUpOverlay from "./components/LevelUpOverlay";
 import CharacterCard from "./components/CharacterCard";
 import { useState, useEffect, useRef } from "react";
+import { usePlayerHp } from "./game/usePlayerHp";
 import CombatScreen from "./components/CombatScreen";
 import BossScreen from "./components/BossScreen";
 import UpgradePanel from "./components/UpgradePanel";
@@ -166,6 +167,7 @@ function App() {
     (gameState.damage + equipmentDamageBonus) * (1 + totalDamageBonusPercent / 100)
   );
   const effectiveHp = gameState.hp + equipmentHpBonus;
+  const playerHp = usePlayerHp(effectiveHp);
 
   const { boss, attackBoss } = useBossFight(effectiveDamage, currentAreaId, isBossActive, gameState.bossesDefeated, handleBossDefeated);
   const bossAvailable = hasAvailableBoss(currentAreaId, gameState.bossesDefeated);
@@ -207,6 +209,7 @@ function App() {
                 autoAttackEnabled={gameState.autoAttackEnabled}
                 critChance={gameState.critChance}
                 critMultiplier={gameState.critMultiplier}
+                playerHp={playerHp}
               />
             )}
 
@@ -224,7 +227,7 @@ function App() {
               </p>
             )}
 
-            {isBossActive && <BossScreen boss={boss} attackBoss={attackBoss} autoAttackEnabled={gameState.autoAttackEnabled} areaId={currentAreaId} />}
+      <CharacterCard gameState={gameState} effectiveHp={playerHp.currentHp} maxHp={playerHp.maxHp} isDown={playerHp.isDown} />
 
             <UpgradePanel gameState={gameState} setGameState={setGameState} />
           </>

@@ -1,8 +1,8 @@
 // CharacterCard.jsx
 import AnimatedNumber from "./AnimatedNumber";
 
-function CharacterCard({ gameState, effectiveHp }) {
-  const hpPercent = 100;
+function CharacterCard({ gameState, effectiveHp, maxHp, isDown }) {
+  const hpPercent = maxHp ? Math.max(0, Math.min(100, (effectiveHp / maxHp) * 100)) : 100;
 
   function getTitle(level) {
     if (level >= 1000) return "Infinity Walker";
@@ -40,10 +40,10 @@ function CharacterCard({ gameState, effectiveHp }) {
           <span style={{ fontSize: "11px", color: "var(--color-accent-gold)" }}>{getTitle(gameState.level)}</span>
         </div>
         <div style={{ fontSize: "11px", color: "var(--color-text-muted)", marginBottom: "3px" }}>
-          Lv.{gameState.level} · <AnimatedNumber value={effectiveHp} /> HP
+          Lv.{gameState.level} · {isDown ? "😵 Down" : <><AnimatedNumber value={effectiveHp} /> HP</>}
         </div>
         <div style={{ background: "#0a0a12", borderRadius: "4px", overflow: "hidden", height: "6px" }}>
-          <div style={{ width: `${hpPercent}%`, background: "linear-gradient(90deg, #27ae60, #2ecc71)", height: "100%" }} />
+          <div style={{ width: `${hpPercent}%`, background: isDown ? "#555" : "linear-gradient(90deg, #27ae60, #2ecc71)", height: "100%", transition: "width 0.2s ease" }} />
         </div>
       </div>
     </div>

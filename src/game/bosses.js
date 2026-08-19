@@ -50,9 +50,11 @@ export function getBossForArea(areaId, defeatedBossIds) {
   if (!bossQueue) return null;
 
   const nextBoss = bossQueue.find((b) => !defeatedBossIds.includes(b.id));
-  if (!nextBoss) return null; // semua boss area ini sudah dikalahkan
+  if (!nextBoss) return null;
 
-  return { ...nextBoss, currentHp: nextBoss.hp };
+  // Boss memukul lebih keras dari musuh biasa (6% dari HP-nya, bukan 4%)
+  const bossDamage = Math.max(1, Math.floor(nextBoss.hp * 0.06));
+  return { ...nextBoss, currentHp: nextBoss.hp, damage: bossDamage };
 }
 
 // Cek apakah masih ada boss yang bisa ditantang di area ini

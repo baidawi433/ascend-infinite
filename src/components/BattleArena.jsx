@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import { getAreaThemeColor } from "../game/areas";
 import AnimatedNumber from "./AnimatedNumber";
 
-function BattleArena({ enemyName, enemyEmoji, enemyKey, enemyHp, enemyMaxHp, isCritical, isDying, triggerAttackId, areaId }) {
+function BattleArena({ enemyName, enemyEmoji, enemyKey, enemyHp, enemyMaxHp, isCritical, isDying, triggerAttackId, areaId, playerHitClass = "" }) {
   const [playerAnim, setPlayerAnim] = useState("sprite-idle");
   const [enemyAnim, setEnemyAnim] = useState("sprite-idle");
   const prevAttackId = useRef(triggerAttackId);
@@ -54,9 +54,9 @@ function BattleArena({ enemyName, enemyEmoji, enemyKey, enemyHp, enemyMaxHp, isC
 
       {/* Arena tengah: player - vs - enemy dengan radial ring */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-around", height: "260px", padding: "0 10px" }}>
-        <div className={playerAnim} style={{ fontSize: "60px", filter: "drop-shadow(0 6px 10px rgba(168,85,247,0.5))" }}>
-          🧙
-        </div>
+        <div className={`${playerAnim} ${playerHitClass}`} style={{ fontSize: "56px", filter: "drop-shadow(0 4px 8px rgba(142,68,173,0.5))" }}>
+        🧙
+      </div>
 
         {/* Enemy dengan radial HP ring di sekelilingnya */}
         <div

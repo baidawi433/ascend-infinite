@@ -89,5 +89,7 @@ export function getRandomEnemy(areaId) {
   const list = enemiesByArea[areaId] || enemiesByArea.whispering_forest;
   const index = Math.floor(Math.random() * list.length);
   const base = list[index];
-  return { ...base, currentHp: base.hp };
+  // Damage musuh dihitung dari HP-nya sendiri, supaya musuh kuat juga memukul lebih keras
+  const enemyDamage = Math.max(1, Math.floor(base.hp * 0.04));
+  return { ...base, currentHp: base.hp, damage: enemyDamage };
 }
