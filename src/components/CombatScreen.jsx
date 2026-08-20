@@ -73,7 +73,8 @@ function CombatScreen({ damage, areaId, onReward, autoAttackEnabled, critChance,
 
   useEffect(() => {
     if (!autoCastEnabled || !lightning.isReady) return;
-    const timeout = setTimeout(() => lightning.castLightning(), 500);
+    const randomDelay = 500 + Math.random() * 1500;
+    const timeout = setTimeout(() => lightning.castLightning(), randomDelay);
     return () => clearTimeout(timeout);
   }, [autoCastEnabled, lightning]);
 
@@ -89,7 +90,7 @@ function CombatScreen({ damage, areaId, onReward, autoAttackEnabled, critChance,
         setIsPlayerHit(true);
         setTimeout(() => setIsPlayerHit(false), 300);
       }, 600);
-    }, 2500);
+    }, 3200);
     return () => clearInterval(enemyAttackTimerRef.current);
   }, [enemy.damage, playerHp.isDown, playerHp.takeDamage, barrier]);
 
