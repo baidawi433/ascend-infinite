@@ -3,6 +3,8 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import { useCombat } from "../game/useCombat";
 import { useAutoAttack } from "../game/useAutoAttack";
 import FloatingDamageNumber from "./FloatingDamageNumber";
+import { useBarrier } from "../game/useBarrier";
+import BarrierButton from "./BarrierButton";
 import BattleArena from "./BattleArena";
 import PlayerHpBar from "./PlayerHpBar";
 import { playAttackSound, playCriticalSound } from "../game/audio";
@@ -27,7 +29,9 @@ function CombatScreen({ damage, areaId, onReward, autoAttackEnabled, critChance,
   const [isPlayerHit, setIsPlayerHit] = useState(false);
   const attackIdRef = useRef(0);
   const [attackTrigger, setAttackTrigger] = useState(0);
+  const [enemyWarning, setEnemyWarning] = useState(false);
   const enemyAttackTimerRef = useRef(null);
+  const barrier = useBarrier();
 
   const handleDamageDealt = useCallback((dmg, critical) => {
     const numberId = `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
@@ -59,12 +63,17 @@ function CombatScreen({ damage, areaId, onReward, autoAttackEnabled, critChance,
   useEffect(() => {
     if (playerHp.isDown) return;
     enemyAttackTimerRef.current = setInterval(() => {
-      playerHp.takeDamage(enemy.damage || 1);
-      setIsPlayerHit(true);
-      setTimeout(() => setIsPlayerHit(false), 300);
+      setEnemyWarning(true);
+      setTimeout(() => {
+        setEnemyWarning(false);
+        const mitigated = barrier.mitigateDamage(enemy.damage || 1);
+        playerHp.takeDamage(mitigated);
+        setIsPlayerHit(true);
+        setTimeout(() => setIsPlayerHit(false), 300);
+      }, 600);
     }, 2500);
     return () => clearInterval(enemyAttackTimerRef.current);
-  }, [enemy.damage, playerHp.isDown, playerHp.takeDamage]);
+  }, [enemy.damage, playerHp.isDown, playerHp.takeDamage, barrier]);
 
   const enemyEmoji = enemyEmojiMap[enemy.id] || "👹";
 
@@ -92,6 +101,15 @@ function CombatScreen({ damage, areaId, onReward, autoAttackEnabled, critChance,
         triggerAttackId={attackTrigger}
         areaId={areaId}
         playerHitClass={isPlayerHit ? "sprite-hit" : ""}
+        enemyWarning={enemyWarning}
+        barrierActive={barrier.isActive}
+      />
+
+      <BarrierButton
+        isActive={barrier.isActive}
+        cooldownRemaining={barrier.cooldownRemaining}
+        cooldownPercent={barrier.cooldownPercent}
+        onActivate={barrier.activateBarrier}
       />
 
       <PlayerHpBar currentHp={playerHp.currentHp} maxHp={playerHp.maxHp} isDown={playerHp.isDown} />

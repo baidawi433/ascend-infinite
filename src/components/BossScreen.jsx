@@ -1,9 +1,11 @@
 // BossScreen.jsx
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useAutoAttack } from "../game/useAutoAttack";
 import { playAttackSound } from "../game/audio";
+import { useBarrier } from "../game/useBarrier";
 import BattleArena from "./BattleArena";
 import PlayerHpBar from "./PlayerHpBar";
+import BarrierButton from "./BarrierButton";
 
 const bossEmojiMap = {
   forest_guardian: "🌳", goblin_king: "👑", sand_wyrm: "🐍", desert_tyrant: "🦂",
@@ -17,6 +19,8 @@ function BossScreen({ boss, attackBoss, autoAttackEnabled, areaId, playerHp }) {
   const [isShaking, setIsShaking] = useState(false);
   const [isPlayerHit, setIsPlayerHit] = useState(false);
   const [attackTrigger, setAttackTrigger] = useState(0);
+  const [enemyWarning, setEnemyWarning] = useState(false);
+  const barrier = useBarrier();
 
   const handleAttack = useCallback(() => {
     setAttackTrigger((prev) => prev + 1);
@@ -31,12 +35,17 @@ function BossScreen({ boss, attackBoss, autoAttackEnabled, areaId, playerHp }) {
   useEffect(() => {
     if (!boss || playerHp.isDown) return;
     const interval = setInterval(() => {
-      playerHp.takeDamage(boss.damage || 5);
-      setIsPlayerHit(true);
-      setTimeout(() => setIsPlayerHit(false), 300);
+      setEnemyWarning(true);
+      setTimeout(() => {
+        setEnemyWarning(false);
+        const mitigated = barrier.mitigateDamage(boss.damage || 5);
+        playerHp.takeDamage(mitigated);
+        setIsPlayerHit(true);
+        setTimeout(() => setIsPlayerHit(false), 300);
+      }, 600);
     }, 2000);
     return () => clearInterval(interval);
-  }, [boss, playerHp.isDown, playerHp.takeDamage]);
+  }, [boss, playerHp.isDown, playerHp.takeDamage, barrier]);
 
   if (!boss) return null;
 
@@ -64,10 +73,19 @@ function BossScreen({ boss, attackBoss, autoAttackEnabled, areaId, playerHp }) {
           triggerAttackId={attackTrigger}
           areaId={areaId}
           playerHitClass={isPlayerHit ? "sprite-hit" : ""}
+          enemyWarning={enemyWarning}
+          barrierActive={barrier.isActive}
         />
       </div>
 
       <PlayerHpBar currentHp={playerHp.currentHp} maxHp={playerHp.maxHp} isDown={playerHp.isDown} />
+
+      <BarrierButton
+        isActive={barrier.isActive}
+        cooldownRemaining={barrier.cooldownRemaining}
+        cooldownPercent={barrier.cooldownPercent}
+        onActivate={barrier.activateBarrier}
+      />
 
       <div style={{ display: "flex", justifyContent: "center", marginTop: "-32px", position: "relative", zIndex: 10 }}>
         <button
