@@ -152,6 +152,10 @@ function App() {
     setGameState((prev) => ({ ...prev, autoAttackEnabled: !prev.autoAttackEnabled }));
   }
 
+  function toggleAutoCast() {
+    setGameState((prev) => ({ ...prev, autoCastEnabled: !prev.autoCastEnabled }));
+  }
+
   const xpNeeded = getXpToNextLevel(gameState.level);
   const skillDamageBonusPercent = getTotalDamageBonus(gameState.unlockedSkills);
   const totalDamageBonusPercent = skillDamageBonusPercent + totalGlobalBonusPercent;
@@ -190,16 +194,22 @@ function App() {
       <div className="tab-content" key={activeTab} style={{ padding: "0 20px" }}>
         {activeTab === "battle" && (
           <>
-            <button
-              onClick={toggleAutoAttack}
-              style={{
-                marginBottom: "10px", padding: "8px 16px",
-                background: gameState.autoAttackEnabled ? "#27ae60" : "#333",
-                color: "white", border: "none", borderRadius: "6px", cursor: "pointer"
-              }}
-            >
-              🤖 Auto Attack: {gameState.autoAttackEnabled ? "ON" : "OFF"}
-            </button>
+            <div style={{ display: "flex", gap: "8px", marginBottom: "10px" }}>
+              <button
+                onClick={toggleAutoAttack}
+                className="hud-pill"
+                style={{ background: gameState.autoAttackEnabled ? "rgba(52,211,153,0.2)" : "rgba(255,255,255,0.05)", color: gameState.autoAttackEnabled ? "#34d399" : "var(--color-text-muted)", border: "none", cursor: "pointer" }}
+              >
+                🤖 Attack {gameState.autoAttackEnabled ? "ON" : "OFF"}
+              </button>
+              <button
+                onClick={toggleAutoCast}
+                className="hud-pill"
+                style={{ background: gameState.autoCastEnabled ? "rgba(251,191,36,0.2)" : "rgba(255,255,255,0.05)", color: gameState.autoCastEnabled ? "#fbbf24" : "var(--color-text-muted)", border: "none", cursor: "pointer" }}
+              >
+                🪄 AutoCast {gameState.autoCastEnabled ? "ON" : "OFF"}
+              </button>
+            </div>
 
             {!isBossActive && (
               <CombatScreen
@@ -210,6 +220,7 @@ function App() {
                 critChance={gameState.critChance}
                 critMultiplier={gameState.critMultiplier}
                 playerHp={playerHp}
+                autoCastEnabled={gameState.autoCastEnabled}
               />
             )}
 

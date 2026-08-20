@@ -4,6 +4,8 @@ import { useCombat } from "../game/useCombat";
 import { useAutoAttack } from "../game/useAutoAttack";
 import FloatingDamageNumber from "./FloatingDamageNumber";
 import { useBarrier } from "../game/useBarrier";
+import { useLightningStrike } from "../game/useLightningStrike";
+import LightningButton from "./LightningButton";
 import BarrierButton from "./BarrierButton";
 import BattleArena from "./BattleArena";
 import PlayerHpBar from "./PlayerHpBar";
@@ -22,7 +24,7 @@ const enemyEmojiMap = {
   infinity_spawn: "♾️", reality_shard: "💎", chaos_entity: "🌀", paradox_wraith: "👻", eternity_construct: "🗿", unmaker: "⚫",
 };
 
-function CombatScreen({ damage, areaId, onReward, autoAttackEnabled, critChance, critMultiplier, playerHp }) {
+function CombatScreen({ damage, areaId, onReward, autoAttackEnabled, critChance, critMultiplier, playerHp, autoCastEnabled }) {
   const [floatingNumbers, setFloatingNumbers] = useState([]);
   const [isCritical, setIsCritical] = useState(false);
   const [isDying, setIsDying] = useState(false);
@@ -32,6 +34,10 @@ function CombatScreen({ damage, areaId, onReward, autoAttackEnabled, critChance,
   const [enemyWarning, setEnemyWarning] = useState(false);
   const enemyAttackTimerRef = useRef(null);
   const barrier = useBarrier();
+    const lightning = useLightningStrike(damage, (strikeDamage) => {
+    handleDamageDealt(strikeDamage, false);
+    attackEnemyWithDamage(strikeDamage);
+  });
 
   const handleDamageDealt = useCallback((dmg, critical) => {
     const numberId = `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
@@ -53,11 +59,23 @@ function CombatScreen({ damage, areaId, onReward, autoAttackEnabled, critChance,
     setFloatingNumbers((prev) => prev.filter((n) => n.id !== id));
   }, []);
 
-  const { enemy, attackEnemy } = useCombat(
+  const { enemy, attackEnemy, attackEnemyWithDamage } = useCombat(
     damage, areaId, onReward, critChance, critMultiplier, handleDamageDealt
   );
 
   useAutoAttack(autoAttackEnabled, attackEnemy);
+    useEffect(() => {
+    if (!autoCastEnabled) return;
+    if (barrier.cooldownRemaining <= 0 && !barrier.isActive && playerHp.currentHp < playerHp.maxHp * 0.5) {
+      barrier.activateBarrier();
+    }
+  }, [autoCastEnabled, barrier, playerHp.currentHp, playerHp.maxHp]);
+
+  useEffect(() => {
+    if (!autoCastEnabled || !lightning.isReady) return;
+    const timeout = setTimeout(() => lightning.castLightning(), 500);
+    return () => clearTimeout(timeout);
+  }, [autoCastEnabled, lightning]);
 
   // Musuh menyerang balik otomatis tiap 2.5 detik, selama tidak down
   useEffect(() => {
@@ -110,6 +128,12 @@ function CombatScreen({ damage, areaId, onReward, autoAttackEnabled, critChance,
         cooldownRemaining={barrier.cooldownRemaining}
         cooldownPercent={barrier.cooldownPercent}
         onActivate={barrier.activateBarrier}
+      />
+
+      <LightningButton
+        cooldownRemaining={lightning.cooldownRemaining}
+        isReady={lightning.isReady}
+        onCast={lightning.castLightning}
       />
 
       <PlayerHpBar currentHp={playerHp.currentHp} maxHp={playerHp.maxHp} isDown={playerHp.isDown} />

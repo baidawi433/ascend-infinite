@@ -30,6 +30,7 @@ export const initialGameState = {
   sfxEnabled: true,
   infinityModeUnlocked: false,
   newGamePlusCount: 0,
+  autoCastEnabled: false,
 };
 
 export const ASCENSION_LEVEL_REQUIREMENT = 20;
