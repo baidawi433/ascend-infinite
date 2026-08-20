@@ -21,6 +21,7 @@ import AscendedOverlay from "./components/AscendedOverlay";
 import NewGamePlusPanel from "./components/NewGamePlusPanel";
 import ParticleBurst from "./components/ParticleBurst";
 import BlacksmithPanel from "./components/BlacksmithPanel";
+import BossRushPanel from "./components/BossRushPanel";
 import { getNewGamePlusBonusPercent } from "./game/useNewGamePlus";
 import { FINAL_BOSS_ID } from "./game/GameState";
 import { loadGame, useAutoSave } from "./game/useSaveGame";
@@ -268,6 +269,7 @@ function App() {
           <>
             <AscensionPanel gameState={gameState} setGameState={setGameState} />
             <NewGamePlusPanel gameState={gameState} setGameState={setGameState} />
+            <BossRushPanel damage={effectiveDamage} gameState={gameState} setGameState={setGameState} />
             <EndlessTowerPanel damage={effectiveDamage} gameState={gameState} setGameState={setGameState} />
             <QuestPanel gameState={gameState} setGameState={setGameState} />
             <SettingsPanel gameState={gameState} setGameState={setGameState} />
