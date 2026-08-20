@@ -31,6 +31,7 @@ export const initialGameState = {
   infinityModeUnlocked: false,
   newGamePlusCount: 0,
   autoCastEnabled: false,
+  materials: {},
 };
 
 export const ASCENSION_LEVEL_REQUIREMENT = 20;

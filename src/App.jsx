@@ -20,6 +20,7 @@ import AnimatedNumber from "./components/AnimatedNumber";
 import AscendedOverlay from "./components/AscendedOverlay";
 import NewGamePlusPanel from "./components/NewGamePlusPanel";
 import ParticleBurst from "./components/ParticleBurst";
+import BlacksmithPanel from "./components/BlacksmithPanel";
 import { getNewGamePlusBonusPercent } from "./game/useNewGamePlus";
 import { FINAL_BOSS_ID } from "./game/GameState";
 import { loadGame, useAutoSave } from "./game/useSaveGame";
@@ -99,7 +100,7 @@ function App() {
   const newGamePlusBonusPercent = getNewGamePlusBonusPercent(gameState.newGamePlusCount);
   const totalGlobalBonusPercent = globalBonusPercent + newGamePlusBonusPercent;
 
-  function handleReward(gold, xp, droppedItem) {
+  function handleReward(gold, xp, droppedItem, droppedMaterial) {
     const skillGoldBonus = getTotalGoldBonus(gameState.unlockedSkills);
     const goldWithBonus = Math.floor(gold * (1 + (totalGlobalBonusPercent + skillGoldBonus) / 100));
 
@@ -119,6 +120,9 @@ function App() {
       totalKills: prev.totalKills + 1,
       totalGoldEarned: prev.totalGoldEarned + goldWithBonus,
       inventory: droppedItem ? [...prev.inventory, droppedItem] : prev.inventory,
+      materials: droppedMaterial
+        ? { ...prev.materials, [droppedMaterial]: (prev.materials[droppedMaterial] || 0) + 1 }
+        : prev.materials,
     }));
   }
 
@@ -255,6 +259,7 @@ function App() {
         {activeTab === "world" && (
           <>
             <WorldMapPanel gameState={gameState} currentAreaId={currentAreaId} setCurrentAreaId={setCurrentAreaId} />
+            <BlacksmithPanel gameState={gameState} setGameState={setGameState} />
             <NpcPanel />
           </>
         )}

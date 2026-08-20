@@ -2,8 +2,10 @@
 import { useState, useEffect } from "react";
 import { getRandomEnemy } from "./enemies";
 import { rollItemDrop } from "./equipment";
+import { rollMaterialDrop } from "./materials";
 
 const ITEM_DROP_CHANCE = 0.3;
+const MATERIAL_DROP_CHANCE = 0.35;
 
 export function useCombat(damage, areaId, onReward, critChance, critMultiplier, onDamageDealt) {
   const [enemy, setEnemy] = useState(getRandomEnemy(areaId));
@@ -17,7 +19,8 @@ export function useCombat(damage, areaId, onReward, critChance, critMultiplier, 
       const newHp = prev.currentHp - finalDamage;
       if (newHp <= 0) {
         const droppedItem = Math.random() <= ITEM_DROP_CHANCE ? rollItemDrop() : null;
-        onReward(prev.goldReward, prev.xpReward, droppedItem);
+        const droppedMaterial = Math.random() <= MATERIAL_DROP_CHANCE ? rollMaterialDrop() : null;
+        onReward(prev.goldReward, prev.xpReward, droppedItem, droppedMaterial);
         return getRandomEnemy(areaId);
       }
       return { ...prev, currentHp: newHp };
@@ -31,7 +34,6 @@ export function useCombat(damage, areaId, onReward, critChance, critMultiplier, 
     dealDamageToEnemy(finalDamage);
   }
 
-  // Untuk skill aktif seperti Lightning Strike, damage sudah dihitung dari luar
   function attackEnemyWithDamage(customDamage) {
     dealDamageToEnemy(customDamage);
   }
