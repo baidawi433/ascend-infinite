@@ -20,7 +20,8 @@ export function useCombat(damage, areaId, onReward, critChance, critMultiplier, 
       if (newHp <= 0) {
         const droppedItem = Math.random() <= ITEM_DROP_CHANCE ? rollItemDrop() : null;
         const droppedMaterial = Math.random() <= MATERIAL_DROP_CHANCE ? rollMaterialDrop() : null;
-        onReward(prev.goldReward, prev.xpReward, droppedItem, droppedMaterial);
+        // Jangan panggil onReward langsung di sini - tunda ke luar render cycle
+        setTimeout(() => onReward(prev.goldReward, prev.xpReward, droppedItem, droppedMaterial), 0);
         return getRandomEnemy(areaId);
       }
       return { ...prev, currentHp: newHp };

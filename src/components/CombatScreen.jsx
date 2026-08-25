@@ -2,13 +2,13 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { useCombat } from "../game/useCombat";
 import { useAutoAttack } from "../game/useAutoAttack";
-import FloatingDamageNumber from "./FloatingDamageNumber";
 import { useBarrier } from "../game/useBarrier";
 import { useLightningStrike } from "../game/useLightningStrike";
-import LightningButton from "./LightningButton";
-import BarrierButton from "./BarrierButton";
+import FloatingDamageNumber from "./FloatingDamageNumber";
 import BattleArena from "./BattleArena";
 import PlayerHpBar from "./PlayerHpBar";
+import BarrierButton from "./BarrierButton";
+import LightningButton from "./LightningButton";
 import { playAttackSound, playCriticalSound } from "../game/audio";
 
 const enemyEmojiMap = {
@@ -29,15 +29,10 @@ function CombatScreen({ damage, areaId, onReward, autoAttackEnabled, critChance,
   const [isCritical, setIsCritical] = useState(false);
   const [isDying, setIsDying] = useState(false);
   const [isPlayerHit, setIsPlayerHit] = useState(false);
+  const [enemyWarning, setEnemyWarning] = useState(false);
   const attackIdRef = useRef(0);
   const [attackTrigger, setAttackTrigger] = useState(0);
-  const [enemyWarning, setEnemyWarning] = useState(false);
   const enemyAttackTimerRef = useRef(null);
-  const barrier = useBarrier();
-    const lightning = useLightningStrike(damage, (strikeDamage) => {
-    handleDamageDealt(strikeDamage, false);
-    attackEnemyWithDamage(strikeDamage);
-  });
 
   const handleDamageDealt = useCallback((dmg, critical) => {
     const numberId = `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
@@ -63,22 +58,18 @@ function CombatScreen({ damage, areaId, onReward, autoAttackEnabled, critChance,
     damage, areaId, onReward, critChance, critMultiplier, handleDamageDealt
   );
 
+  const barrier = useBarrier();
+
+  const handleLightningStrike = useCallback((strikeDamage) => {
+    handleDamageDealt(strikeDamage, false);
+    attackEnemyWithDamage(strikeDamage);
+  }, [handleDamageDealt, attackEnemyWithDamage]);
+
+  const lightning = useLightningStrike(damage, handleLightningStrike);
+
   useAutoAttack(autoAttackEnabled, attackEnemy);
-    useEffect(() => {
-    if (!autoCastEnabled) return;
-    if (barrier.cooldownRemaining <= 0 && !barrier.isActive && playerHp.currentHp < playerHp.maxHp * 0.5) {
-      barrier.activateBarrier();
-    }
-  }, [autoCastEnabled, barrier, playerHp.currentHp, playerHp.maxHp]);
 
-  useEffect(() => {
-    if (!autoCastEnabled || !lightning.isReady) return;
-    const randomDelay = 500 + Math.random() * 1500;
-    const timeout = setTimeout(() => lightning.castLightning(), randomDelay);
-    return () => clearTimeout(timeout);
-  }, [autoCastEnabled, lightning]);
-
-  // Musuh menyerang balik otomatis tiap 2.5 detik, selama tidak down
+  // Musuh menyerang balik otomatis tiap 3.2 detik, selama tidak down
   useEffect(() => {
     if (playerHp.isDown) return;
     enemyAttackTimerRef.current = setInterval(() => {
@@ -92,7 +83,26 @@ function CombatScreen({ damage, areaId, onReward, autoAttackEnabled, critChance,
       }, 600);
     }, 3200);
     return () => clearInterval(enemyAttackTimerRef.current);
-  }, [enemy.damage, playerHp.isDown, playerHp.takeDamage, barrier]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [enemy.damage, playerHp.isDown]);
+
+  // Auto Cast Barrier: hanya jalan kalau toggle ON, HP < 50%, dan barrier siap
+  useEffect(() => {
+    if (!autoCastEnabled) return;
+    if (barrier.cooldownRemaining <= 0 && !barrier.isActive && playerHp.currentHp < playerHp.maxHp * 0.5) {
+      barrier.activateBarrier();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoCastEnabled, barrier.cooldownRemaining, barrier.isActive, playerHp.currentHp, playerHp.maxHp]);
+
+  // Auto Cast Lightning: hanya jalan kalau toggle ON dan skill siap
+  useEffect(() => {
+    if (!autoCastEnabled || !lightning.isReady) return;
+    const randomDelay = 500 + Math.random() * 1500;
+    const timeout = setTimeout(() => lightning.castLightning(), randomDelay);
+    return () => clearTimeout(timeout);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoCastEnabled, lightning.isReady]);
 
   const enemyEmoji = enemyEmojiMap[enemy.id] || "👹";
 
@@ -124,6 +134,8 @@ function CombatScreen({ damage, areaId, onReward, autoAttackEnabled, critChance,
         barrierActive={barrier.isActive}
       />
 
+      <PlayerHpBar currentHp={playerHp.currentHp} maxHp={playerHp.maxHp} isDown={playerHp.isDown} />
+
       <BarrierButton
         isActive={barrier.isActive}
         cooldownRemaining={barrier.cooldownRemaining}
@@ -136,8 +148,6 @@ function CombatScreen({ damage, areaId, onReward, autoAttackEnabled, critChance,
         isReady={lightning.isReady}
         onCast={lightning.castLightning}
       />
-
-      <PlayerHpBar currentHp={playerHp.currentHp} maxHp={playerHp.maxHp} isDown={playerHp.isDown} />
 
       <div style={{ display: "flex", justifyContent: "center", marginTop: "-32px", position: "relative", zIndex: 10 }}>
         <button onClick={attackEnemy} className="fab-attack" disabled={playerHp.isDown} style={playerHp.isDown ? { opacity: 0.4, cursor: "not-allowed" } : {}}>

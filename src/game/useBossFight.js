@@ -1,16 +1,18 @@
 // useBossFight.js
-// Mengatur logika combat melawan boss, mendukung multi-boss per area
-
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { getBossForArea } from "./bosses";
 
 export function useBossFight(damage, areaId, isBossActive, defeatedBossIds, onBossDefeated) {
   const [boss, setBoss] = useState(null);
+  const prevIsBossActiveRef = useRef(isBossActive);
 
   useEffect(() => {
-    if (isBossActive) {
+    const justActivated = isBossActive && !prevIsBossActiveRef.current;
+    prevIsBossActiveRef.current = isBossActive;
+
+    if (justActivated) {
       setBoss(getBossForArea(areaId, defeatedBossIds));
-    } else {
+    } else if (!isBossActive) {
       setBoss(null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -24,7 +26,7 @@ export function useBossFight(damage, areaId, isBossActive, defeatedBossIds, onBo
       const newHp = prev.currentHp - damage;
 
       if (newHp <= 0) {
-        onBossDefeated(prev.id, prev.goldReward, prev.xpReward, prev.skillPointReward);
+        setTimeout(() => onBossDefeated(prev.id, prev.goldReward, prev.xpReward, prev.skillPointReward), 0);
         return null;
       }
 

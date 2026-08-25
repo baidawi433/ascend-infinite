@@ -217,6 +217,13 @@ function App() {
             </div>
 
             {!isBossActive && (
+              <div style={{ marginBottom: "10px", fontSize: "12px", color: "var(--color-text-muted)" }}>
+                💀 Boss progress: {gameState.killCount} / {KILLS_TO_UNLOCK_BOSS} kills
+                {!bossAvailable && <span style={{ color: "var(--color-accent-gold)", marginLeft: "6px" }}>(All bosses here defeated - explore World tab!)</span>}
+              </div>
+            )}
+
+            {!isBossActive && (
               <CombatScreen
                 damage={effectiveDamage}
                 areaId={currentAreaId}
@@ -229,9 +236,25 @@ function App() {
               />
             )}
 
+            {isBossActive && (
+              <BossScreen
+                boss={boss}
+                attackBoss={attackBoss}
+                autoAttackEnabled={gameState.autoAttackEnabled}
+                areaId={currentAreaId}
+                playerHp={playerHp}
+              />
+            )}
+
             {canChallengeBoss && (
               <button
-                onClick={() => setIsBossActive(true)}
+                onClick={() => {
+                  if (hasAvailableBoss(currentAreaId, gameState.bossesDefeated)) {
+                    setIsBossActive(true);
+                  } else {
+                    alert("No boss available in this area right now.");
+                  }
+                }}
                 style={{ marginTop: "15px", padding: "10px 20px", background: "#e74c3c", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "16px" }}
               >
                 🔥 Challenge Boss!
