@@ -3,14 +3,19 @@
 
 import { useEffect } from "react";
 
+const MAX_VISIBLE_TOASTS = 2; // maksimal 2 toast tampil sekaligus, sisanya diabaikan biar tidak menumpuk
+const TOAST_DURATION_MS = 1400; // dipercepat dari 3000ms
+
 function ToastNotification({ toasts, onRemove }) {
+  const visibleToasts = toasts.slice(-MAX_VISIBLE_TOASTS);
+
   return (
     <div style={{
       position: "fixed", top: "16px", right: "16px",
       display: "flex", flexDirection: "column", gap: "8px",
-      zIndex: 2000, maxWidth: "280px"
+      zIndex: 2000, maxWidth: "260px"
     }}>
-      {toasts.map((toast) => (
+      {visibleToasts.map((toast) => (
         <Toast key={toast.id} toast={toast} onRemove={onRemove} />
       ))}
     </div>
@@ -19,7 +24,7 @@ function ToastNotification({ toasts, onRemove }) {
 
 function Toast({ toast, onRemove }) {
   useEffect(() => {
-    const timeout = setTimeout(() => onRemove(toast.id), 3000);
+    const timeout = setTimeout(() => onRemove(toast.id), TOAST_DURATION_MS);
     return () => clearTimeout(timeout);
   }, [toast.id, onRemove]);
 
@@ -33,19 +38,19 @@ function Toast({ toast, onRemove }) {
   return (
     <div
       style={{
-        padding: "10px 14px",
+        padding: "8px 12px",
         background: "#141420",
         border: `1px solid ${colors[toast.type] || "#8e44ad"}`,
         borderLeft: `4px solid ${colors[toast.type] || "#8e44ad"}`,
         borderRadius: "8px",
         color: "white",
-        fontSize: "13px",
+        fontSize: "12px",
         boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
-        animation: "slideIn 0.25s ease-out",
+        animation: "slideIn 0.2s ease-out",
       }}
     >
-      <strong>{toast.title}</strong>
-      {toast.subtitle && <p style={{ margin: "2px 0 0 0", color: "#aaa", fontSize: "12px" }}>{toast.subtitle}</p>}
+      <strong style={{ fontSize: "12px" }}>{toast.title}</strong>
+      {toast.subtitle && <p style={{ margin: "1px 0 0 0", color: "#aaa", fontSize: "11px" }}>{toast.subtitle}</p>}
     </div>
   );
 }
