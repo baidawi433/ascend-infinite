@@ -34,6 +34,7 @@ export const initialGameState = {
   materials: {},
   lastLoginTimestamp: 0,
   loginStreak: 0,
+  prestigeUpgrades: {},
 };
 
 export const ASCENSION_LEVEL_REQUIREMENT = 20;

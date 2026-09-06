@@ -23,6 +23,8 @@ import ParticleBurst from "./components/ParticleBurst";
 import BlacksmithPanel from "./components/BlacksmithPanel";
 import BossRushPanel from "./components/BossRushPanel";
 import DailyLoginPopup from "./components/DailyLoginPopup";
+import PrestigeShopPanel from "./components/PrestigeShopPanel";
+import { getPrestigeBonuses } from "./game/usePrestigeShop";
 import { useDailyLogin } from "./game/useDailyLogin";
 import { getNewGamePlusBonusPercent } from "./game/useNewGamePlus";
 import { FINAL_BOSS_ID } from "./game/GameState";
@@ -106,7 +108,7 @@ function App() {
 
   function handleReward(gold, xp, droppedItem, droppedMaterial) {
     const skillGoldBonus = getTotalGoldBonus(gameState.unlockedSkills);
-    const goldWithBonus = Math.floor(gold * (1 + (totalGlobalBonusPercent + skillGoldBonus) / 100));
+    const goldWithBonus = Math.floor(gold * (1 + (totalGlobalBonusPercent + skillGoldBonus + prestigeBonuses.goldPercentBonus) / 100));
 
     if (droppedItem) {
       playLootSound();
@@ -131,7 +133,7 @@ function App() {
   }
 
   function handleBossDefeated(bossId, gold, xp, skillPoints) {
-    const goldWithBonus = Math.floor(gold * (1 + totalGlobalBonusPercent / 100));
+    const goldWithBonus = Math.floor(gold * (1 + (totalGlobalBonusPercent + prestigeBonuses.goldPercentBonus) / 100));
     playBossDefeatSound();
     addToast("boss", "BOSS DEFEATED!", `+${skillPoints} Skill Points`);
     fireParticleBurst("gold");
@@ -178,7 +180,8 @@ function App() {
   const effectiveDamage = Math.floor(
     (gameState.damage + equipmentDamageBonus) * (1 + totalDamageBonusPercent / 100)
   );
-  const effectiveHp = gameState.hp + equipmentHpBonus;
+  const prestigeBonuses = getPrestigeBonuses(gameState.prestigeUpgrades);
+  const effectiveHp = gameState.hp + equipmentHpBonus + prestigeBonuses.maxHpBonus;
   const playerHp = usePlayerHp(effectiveHp);
 
   const { boss, attackBoss } = useBossFight(effectiveDamage, currentAreaId, isBossActive, gameState.bossesDefeated, handleBossDefeated);
@@ -294,6 +297,7 @@ function App() {
         {activeTab === "progress" && (
           <>
             <AscensionPanel gameState={gameState} setGameState={setGameState} />
+            <PrestigeShopPanel gameState={gameState} setGameState={setGameState} />
             <NewGamePlusPanel gameState={gameState} setGameState={setGameState} />
             <BossRushPanel damage={effectiveDamage} gameState={gameState} setGameState={setGameState} />
             <EndlessTowerPanel damage={effectiveDamage} gameState={gameState} setGameState={setGameState} />
