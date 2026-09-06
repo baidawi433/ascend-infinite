@@ -24,6 +24,7 @@ import BlacksmithPanel from "./components/BlacksmithPanel";
 import BossRushPanel from "./components/BossRushPanel";
 import DailyLoginPopup from "./components/DailyLoginPopup";
 import PrestigeShopPanel from "./components/PrestigeShopPanel";
+import PersonalBestPanel from "./components/PersonalBestPanel";
 import { getPrestigeBonuses } from "./game/usePrestigeShop";
 import { useDailyLogin } from "./game/useDailyLogin";
 import { getNewGamePlusBonusPercent } from "./game/useNewGamePlus";
@@ -86,6 +87,10 @@ function App() {
       playLevelUpSound();
       setShowLevelUp(true);
       fireParticleBurst("purple");
+      setGameState((prev) => ({
+        ...prev,
+        records: { ...prev.records, highestLevel: Math.max(prev.records?.highestLevel || 1, prev.level) },
+      }));
     }
     prevLevelRef.current = gameState.level;
   }, [gameState.level]);
@@ -109,6 +114,7 @@ function App() {
   function handleReward(gold, xp, droppedItem, droppedMaterial) {
     const skillGoldBonus = getTotalGoldBonus(gameState.unlockedSkills);
     const goldWithBonus = Math.floor(gold * (1 + (totalGlobalBonusPercent + skillGoldBonus + prestigeBonuses.goldPercentBonus) / 100));
+    const newHighestGold = Math.max(gameState.records?.highestGoldFromKill || 0, goldWithBonus);
 
     if (droppedItem) {
       playLootSound();
@@ -129,6 +135,7 @@ function App() {
       materials: droppedMaterial
         ? { ...prev.materials, [droppedMaterial]: (prev.materials[droppedMaterial] || 0) + 1 }
         : prev.materials,
+      records: { ...prev.records, highestGoldFromKill: newHighestGold },
     }));
   }
 
@@ -296,6 +303,7 @@ function App() {
 
         {activeTab === "progress" && (
           <>
+            <PersonalBestPanel gameState={gameState} />
             <AscensionPanel gameState={gameState} setGameState={setGameState} />
             <PrestigeShopPanel gameState={gameState} setGameState={setGameState} />
             <NewGamePlusPanel gameState={gameState} setGameState={setGameState} />

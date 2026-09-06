@@ -35,6 +35,12 @@ export const initialGameState = {
   lastLoginTimestamp: 0,
   loginStreak: 0,
   prestigeUpgrades: {},
+  records: {
+    highestDamageHit: 0,
+    highestGoldFromKill: 0,
+    highestLevel: 1,
+    fastestBossKillMs: null,
+  },
 };
 
 export const ASCENSION_LEVEL_REQUIREMENT = 20;
