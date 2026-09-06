@@ -26,6 +26,9 @@ import DailyLoginPopup from "./components/DailyLoginPopup";
 import PrestigeShopPanel from "./components/PrestigeShopPanel";
 import PersonalBestPanel from "./components/PersonalBestPanel";
 import PetPanel from "./components/PetPanel";
+import MainMenu from "./components/MainMenu";
+import MenuSettingsPanel from "./components/MenuSettingsPanel";
+import { initialGameState } from "./game/GameState";
 import { petList, getPetBonus } from "./game/pets";
 import { getPrestigeBonuses } from "./game/usePrestigeShop";
 import { useDailyLogin } from "./game/useDailyLogin";
@@ -50,6 +53,12 @@ const AVERAGE_XP_PER_KILL = 4;
 
 function App() {
   const [gameState, setGameState] = useState(loadGame());
+  const [screen, setScreen] = useState("menu"); // "menu" | "menuSettings" | "game"
+  const [menuSettings, setMenuSettings] = useState({
+    sfxEnabled: true,
+    graphicsQuality: "High",
+    particlesEnabled: true,
+  });
   const [currentAreaId, setCurrentAreaId] = useState("whispering_forest");
   const [isBossActive, setIsBossActive] = useState(false);
   const [activeTab, setActiveTab] = useState("battle");
@@ -198,6 +207,30 @@ function App() {
   const { boss, attackBoss } = useBossFight(effectiveDamage, currentAreaId, isBossActive, gameState.bossesDefeated, handleBossDefeated);
   const bossAvailable = hasAvailableBoss(currentAreaId, gameState.bossesDefeated);
   const canChallengeBoss = gameState.killCount >= KILLS_TO_UNLOCK_BOSS && !isBossActive && bossAvailable;
+
+  if (screen === "menu") {
+    return (
+      <MainMenu
+        hasSaveData={gameState.totalKills > 0 || gameState.level > 1}
+        onContinue={() => setScreen("game")}
+        onNewGame={() => {
+          setGameState(initialGameState);
+          setScreen("game");
+        }}
+        onOpenSettings={() => setScreen("menuSettings")}
+      />
+    );
+  }
+
+  if (screen === "menuSettings") {
+    return (
+      <MenuSettingsPanel
+        settings={menuSettings}
+        setSettings={setMenuSettings}
+        onBack={() => setScreen("menu")}
+      />
+    );
+  }
 
   return (
     <div style={{ color: "white", background: "#0a0a1a", minHeight: "100vh", paddingBottom: "70px", fontFamily: "sans-serif" }}>
