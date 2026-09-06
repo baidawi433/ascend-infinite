@@ -32,6 +32,8 @@ export const initialGameState = {
   newGamePlusCount: 0,
   autoCastEnabled: false,
   materials: {},
+  lastLoginTimestamp: 0,
+  loginStreak: 0,
 };
 
 export const ASCENSION_LEVEL_REQUIREMENT = 20;

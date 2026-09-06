@@ -22,6 +22,8 @@ import NewGamePlusPanel from "./components/NewGamePlusPanel";
 import ParticleBurst from "./components/ParticleBurst";
 import BlacksmithPanel from "./components/BlacksmithPanel";
 import BossRushPanel from "./components/BossRushPanel";
+import DailyLoginPopup from "./components/DailyLoginPopup";
+import { useDailyLogin } from "./game/useDailyLogin";
 import { getNewGamePlusBonusPercent } from "./game/useNewGamePlus";
 import { FINAL_BOSS_ID } from "./game/GameState";
 import { loadGame, useAutoSave } from "./game/useSaveGame";
@@ -47,6 +49,7 @@ function App() {
   const [isBossActive, setIsBossActive] = useState(false);
   const [activeTab, setActiveTab] = useState("battle");
   const [toasts, setToasts] = useState([]);
+  const dailyLogin = useDailyLogin(gameState, setGameState);
 
   function addToast(type, title, subtitle) {
     const id = `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
@@ -301,6 +304,12 @@ function App() {
       </div>
 
       <OfflineProgressPopup offlineReport={offlineReport} onClaim={claimOfflineProgress} />
+      <DailyLoginPopup
+        show={dailyLogin.showPopup}
+        todayReward={dailyLogin.todayReward}
+        dailyRewards={dailyLogin.dailyRewards}
+        onClaim={dailyLogin.claimDailyReward}
+      />
       <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
       <LevelUpOverlay show={showLevelUp} level={gameState.level} onDone={() => setShowLevelUp(false)} />
       <AscendedOverlay show={showAscendedOverlay} onClose={() => setShowAscendedOverlay(false)} />
