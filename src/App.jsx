@@ -177,6 +177,8 @@ function App() {
 
   const xpNeeded = getXpToNextLevel(gameState.level);
   const skillDamageBonusPercent = getTotalDamageBonus(gameState.unlockedSkills);
+  const petDamageBonus = getPetBonus(gameState.equippedPetId, "damage");
+  const petGoldBonus = getPetBonus(gameState.equippedPetId, "gold");
   const totalDamageBonusPercent = skillDamageBonusPercent + totalGlobalBonusPercent + petDamageBonus;
   const equipmentDamageBonus = Object.values(gameState.equippedItems)
     .filter((item) => item && item.statType === "damageBonus")
@@ -191,8 +193,6 @@ function App() {
   );
   const prestigeBonuses = getPrestigeBonuses(gameState.prestigeUpgrades);
   const effectiveHp = gameState.hp + equipmentHpBonus + prestigeBonuses.maxHpBonus;
-  const petDamageBonus = getPetBonus(gameState.equippedPetId, "damage");
-  const petGoldBonus = getPetBonus(gameState.equippedPetId, "gold");
   const playerHp = usePlayerHp(effectiveHp);
 
   const { boss, attackBoss } = useBossFight(effectiveDamage, currentAreaId, isBossActive, gameState.bossesDefeated, handleBossDefeated);
