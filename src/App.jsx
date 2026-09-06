@@ -25,6 +25,8 @@ import BossRushPanel from "./components/BossRushPanel";
 import DailyLoginPopup from "./components/DailyLoginPopup";
 import PrestigeShopPanel from "./components/PrestigeShopPanel";
 import PersonalBestPanel from "./components/PersonalBestPanel";
+import PetPanel from "./components/PetPanel";
+import { petList, getPetBonus } from "./game/pets";
 import { getPrestigeBonuses } from "./game/usePrestigeShop";
 import { useDailyLogin } from "./game/useDailyLogin";
 import { getNewGamePlusBonusPercent } from "./game/useNewGamePlus";
@@ -113,7 +115,7 @@ function App() {
 
   function handleReward(gold, xp, droppedItem, droppedMaterial) {
     const skillGoldBonus = getTotalGoldBonus(gameState.unlockedSkills);
-    const goldWithBonus = Math.floor(gold * (1 + (totalGlobalBonusPercent + skillGoldBonus + prestigeBonuses.goldPercentBonus) / 100));
+    const goldWithBonus = Math.floor(gold * (1 + (totalGlobalBonusPercent + skillGoldBonus + prestigeBonuses.goldPercentBonus + petGoldBonus) / 100));
     const newHighestGold = Math.max(gameState.records?.highestGoldFromKill || 0, goldWithBonus);
 
     if (droppedItem) {
@@ -175,7 +177,7 @@ function App() {
 
   const xpNeeded = getXpToNextLevel(gameState.level);
   const skillDamageBonusPercent = getTotalDamageBonus(gameState.unlockedSkills);
-  const totalDamageBonusPercent = skillDamageBonusPercent + totalGlobalBonusPercent;
+  const totalDamageBonusPercent = skillDamageBonusPercent + totalGlobalBonusPercent + petDamageBonus;
   const equipmentDamageBonus = Object.values(gameState.equippedItems)
     .filter((item) => item && item.statType === "damageBonus")
     .reduce((total, item) => total + item.statValue, 0);
@@ -189,6 +191,8 @@ function App() {
   );
   const prestigeBonuses = getPrestigeBonuses(gameState.prestigeUpgrades);
   const effectiveHp = gameState.hp + equipmentHpBonus + prestigeBonuses.maxHpBonus;
+  const petDamageBonus = getPetBonus(gameState.equippedPetId, "damage");
+  const petGoldBonus = getPetBonus(gameState.equippedPetId, "gold");
   const playerHp = usePlayerHp(effectiveHp);
 
   const { boss, attackBoss } = useBossFight(effectiveDamage, currentAreaId, isBossActive, gameState.bossesDefeated, handleBossDefeated);
@@ -246,6 +250,7 @@ function App() {
                 critMultiplier={gameState.critMultiplier}
                 playerHp={playerHp}
                 autoCastEnabled={gameState.autoCastEnabled}
+                petEmoji={petList.find((p) => p.id === gameState.equippedPetId)?.emoji || null}
               />
             )}
 
@@ -290,7 +295,10 @@ function App() {
         )}
 
         {activeTab === "inventory" && (
-          <InventoryPanel gameState={gameState} setGameState={setGameState} />
+          <>
+            <InventoryPanel gameState={gameState} setGameState={setGameState} />
+            <PetPanel gameState={gameState} setGameState={setGameState} />
+          </>
         )}
 
         {activeTab === "world" && (

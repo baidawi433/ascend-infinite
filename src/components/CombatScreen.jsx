@@ -24,7 +24,7 @@ const enemyEmojiMap = {
   infinity_spawn: "♾️", reality_shard: "💎", chaos_entity: "🌀", paradox_wraith: "👻", eternity_construct: "🗿", unmaker: "⚫",
 };
 
-function CombatScreen({ damage, areaId, onReward, autoAttackEnabled, critChance, critMultiplier, playerHp, autoCastEnabled }) {
+function CombatScreen({ damage, areaId, onReward, autoAttackEnabled, critChance, critMultiplier, playerHp, autoCastEnabled, petEmoji }) {
   const [floatingNumbers, setFloatingNumbers] = useState([]);
   const [isCritical, setIsCritical] = useState(false);
   const [isDying, setIsDying] = useState(false);
@@ -119,7 +119,7 @@ function CombatScreen({ damage, areaId, onReward, autoAttackEnabled, critChance,
 
   return (
     <div style={{ position: "relative" }}>
-      <BattleArena
+            <BattleArena
         enemyName={enemy.name}
         enemyEmoji={enemyEmoji}
         enemyKey={enemy.id + enemy.hp}
@@ -132,6 +132,7 @@ function CombatScreen({ damage, areaId, onReward, autoAttackEnabled, critChance,
         playerHitClass={isPlayerHit ? "sprite-hit" : ""}
         enemyWarning={enemyWarning}
         barrierActive={barrier.isActive}
+        petEmoji={petEmoji}
       />
 
       <PlayerHpBar currentHp={playerHp.currentHp} maxHp={playerHp.maxHp} isDown={playerHp.isDown} />

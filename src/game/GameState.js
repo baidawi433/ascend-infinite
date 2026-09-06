@@ -41,6 +41,8 @@ export const initialGameState = {
     highestLevel: 1,
     fastestBossKillMs: null,
   },
+  ownedPets: [],
+  equippedPetId: null,
 };
 
 export const ASCENSION_LEVEL_REQUIREMENT = 20;

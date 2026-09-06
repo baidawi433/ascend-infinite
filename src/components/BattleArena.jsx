@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { getAreaThemeColor } from "../game/areas";
 import AnimatedNumber from "./AnimatedNumber";
 
-function BattleArena({ enemyName, enemyEmoji, enemyKey, enemyHp, enemyMaxHp, isCritical, isDying, triggerAttackId, areaId, playerHitClass = "", enemyWarning = false, barrierActive = false }) {
+function BattleArena({ enemyName, enemyEmoji, enemyKey, enemyHp, enemyMaxHp, isCritical, isDying, triggerAttackId, areaId, playerHitClass = "", enemyWarning = false, barrierActive = false, petEmoji = null }) {
   const [playerAnim, setPlayerAnim] = useState("sprite-idle");
   const [enemyAnim, setEnemyAnim] = useState("sprite-idle");
   const prevAttackId = useRef(triggerAttackId);
@@ -55,6 +55,11 @@ function BattleArena({ enemyName, enemyEmoji, enemyKey, enemyHp, enemyMaxHp, isC
           <div className={`${playerAnim} ${playerHitClass}`} style={{ fontSize: "56px", filter: "drop-shadow(0 4px 8px rgba(168,85,247,0.5))", position: "relative" }}>
             🧙
           </div>
+          {petEmoji && (
+            <div className="sprite-idle" style={{ position: "absolute", bottom: "-6px", right: "-16px", fontSize: "26px" }}>
+              {petEmoji}
+            </div>
+          )}
         </div>
 
         <div
