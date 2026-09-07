@@ -75,6 +75,7 @@ function BossScreen({ boss, attackBoss, autoAttackEnabled, areaId, playerHp }) {
           playerHitClass={isPlayerHit ? "sprite-hit" : ""}
           enemyWarning={enemyWarning}
           barrierActive={barrier.isActive}
+          isBoss={true}
         />
       </div>
 

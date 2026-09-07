@@ -8,6 +8,11 @@ const NEAR_DISTANCE_PERCENT = 58;
 const APPROACH_STEP = 2.2;
 const APPROACH_INTERVAL_MS = 400;
 
+// Untuk boss, mendekat lebih cepat dan lebih dekat, supaya terasa lebih mengancam
+const BOSS_NEAR_DISTANCE_PERCENT = 50;
+const BOSS_APPROACH_STEP = 3.2;
+const BOSS_APPROACH_INTERVAL_MS = 300;
+
 function AmbientParticles() {
   const particles = useMemo(() => {
     return Array.from({ length: 8 }, (_, i) => ({
@@ -56,6 +61,11 @@ function BattleArena(props) {
   const enemyWarning = props.enemyWarning || false;
   const barrierActive = props.barrierActive || false;
   const petEmoji = props.petEmoji || null;
+  const isBoss = props.isBoss || false;
+
+  const nearDistance = isBoss ? BOSS_NEAR_DISTANCE_PERCENT : NEAR_DISTANCE_PERCENT;
+  const approachStep = isBoss ? BOSS_APPROACH_STEP : APPROACH_STEP;
+  const approachInterval = isBoss ? BOSS_APPROACH_INTERVAL_MS : APPROACH_INTERVAL_MS;
 
   const [playerAnim, setPlayerAnim] = useState("sprite-idle");
   const [enemyHitAnim, setEnemyHitAnim] = useState("");
@@ -73,9 +83,10 @@ function BattleArena(props) {
   useEffect(() => {
     if (isDying) return;
     const interval = setInterval(() => {
-      setEnemyDistance((prev) => Math.max(NEAR_DISTANCE_PERCENT, prev - APPROACH_STEP));
-    }, APPROACH_INTERVAL_MS);
+      setEnemyDistance((prev) => Math.max(nearDistance, prev - approachStep));
+    }, approachInterval);
     return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDying, enemyKey]);
 
   useEffect(() => {
@@ -96,7 +107,7 @@ function BattleArena(props) {
   const ringStyle = { background: "conic-gradient(#f43f5e " + hpPercent + "%, rgba(255,255,255,0.08) " + hpPercent + "%)" };
 
   const chargeDistancePx = Math.max(50, (enemyDistance - 30) * 2.2);
-  const isEnemyClose = enemyDistance <= NEAR_DISTANCE_PERCENT + 3;
+  const isEnemyClose = enemyDistance <= nearDistance + 3;
 
   const playerWrapperStyle = { position: "relative" };
   playerWrapperStyle["--charge-distance"] = chargeDistancePx + "px";
@@ -166,14 +177,14 @@ function BattleArena(props) {
           <div
             key={enemyKey}
             className={isDying ? "sprite-dying" : "sprite-spawning"}
-            style={{ width: "100px", height: "100px", borderRadius: "50%", padding: "5px", background: ringStyle.background, display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.15s ease", position: "relative" }}
+            style={{ width: isBoss ? "120px" : "100px", height: isBoss ? "120px" : "100px", borderRadius: "50%", padding: "5px", background: ringStyle.background, display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.15s ease", position: "relative" }}
           >
             {enemyWarning && (
-              <div style={{ position: "absolute", top: "-6px", right: "-6px", fontSize: "18px", animation: "enrageGlow 0.3s ease-in-out infinite" }}>
+              <div style={{ position: "absolute", top: "-6px", right: "-6px", fontSize: isBoss ? "22px" : "18px", animation: "enrageGlow 0.3s ease-in-out infinite" }}>
                 ⚡
               </div>
             )}
-            <div className={"sprite-enemy-idle " + enemyHitAnim} style={{ width: "100%", height: "100%", borderRadius: "50%", background: "#05050f", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "40px" }}>
+            <div className={"sprite-enemy-idle " + enemyHitAnim} style={{ width: "100%", height: "100%", borderRadius: "50%", background: "#05050f", display: "flex", alignItems: "center", justifyContent: "center", fontSize: isBoss ? "50px" : "40px" }}>
               {enemyEmoji}
             </div>
           </div>
